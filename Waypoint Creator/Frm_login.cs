@@ -69,7 +69,7 @@ namespace Frm_waypoint
         private void LoadMain()
         {
             // Open Frm_waypoint and hide login form.
-            System.Windows.Forms.Form Frm_Main = new frm_Waypoint();
+            System.Windows.Forms.Form Frm_Main = new Frm_Waypoint();
             Frm_Main.Show();
             this.Hide();
         }

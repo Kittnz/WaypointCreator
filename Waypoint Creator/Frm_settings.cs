@@ -111,7 +111,10 @@ namespace Frm_waypoint
                 chkBoxCPP.CheckState = CheckState.Checked;
             else
                 chkBoxCPP.CheckState = CheckState.Unchecked;
-
+            if (Properties.Settings.Default.vmangos == true)
+                chkBoxvmangos.CheckState = CheckState.Checked;
+            else
+                chkBoxvmangos.CheckState = CheckState.Unchecked;
             if (Properties.Settings.Default.Lines == true)
                 chkBoxLine.CheckState = CheckState.Checked;
             else
@@ -155,6 +158,11 @@ namespace Frm_waypoint
             else
                 Properties.Settings.Default.CPP = false;
 
+            if (chkBoxvmangos.CheckState == CheckState.Checked)
+                Properties.Settings.Default.vmangos = true;
+            else
+                Properties.Settings.Default.vmangos = false;
+
             if (chkBoxLine.CheckState == CheckState.Checked)
                 Properties.Settings.Default.Lines = true;
             else
@@ -183,12 +191,23 @@ namespace Frm_waypoint
             chkBoxUDB.CheckState = CheckState.Unchecked;
             chkBoxSAI.CheckState = CheckState.Unchecked;
             chkBoxCPP.CheckState = CheckState.Unchecked;
+            chkBoxvmangos.CheckState = CheckState.Unchecked;
             chkBoxLine.CheckState = CheckState.Checked;
             chkBoxSpline.CheckState = CheckState.Unchecked;
             picBoxPointColour.BackColor = Color.Blue;
             picBoxLineColour.BackColor = Color.Aqua;
             picBoxBackColour.BackColor = Color.White;
             picBoxTitleColour.BackColor = Color.Blue;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkBoxLine_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

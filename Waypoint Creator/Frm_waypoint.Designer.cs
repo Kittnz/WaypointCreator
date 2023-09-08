@@ -1,6 +1,6 @@
 ﻿namespace Frm_waypoint
 {
-    partial class frm_Waypoint
+    partial class Frm_Waypoint
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frm_Waypoint));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Waypoint));
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
@@ -141,7 +141,7 @@
             this.toolStripButtonSave.Text = "Write SQL";
             this.toolStripButtonSave.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
             this.toolStripButtonSave.ToolTipText = "Write textbox to SQL file.";
-            this.toolStripButtonSave.Click += new System.EventHandler(this.toolStripButtonSave_Click);
+            this.toolStripButtonSave.Click += new System.EventHandler(this.ToolStripButtonSave_Click);
             // 
             // tabEditor
             // 
@@ -259,7 +259,7 @@
             this.listBox.Name = "listBox";
             this.listBox.Size = new System.Drawing.Size(476, 1207);
             this.listBox.TabIndex = 24;
-            this.listBox.SelectedIndexChanged += new System.EventHandler(this.listBox_SelectedIndexChanged);
+            this.listBox.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
             // 
             // gridWaypoint
             // 
@@ -398,28 +398,28 @@
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
             this.cutToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.cutToolStripMenuItem.Text = "Cut";
-            this.cutToolStripMenuItem.Click += new System.EventHandler(this.cutToolStripMenuItem_Click);
+            this.cutToolStripMenuItem.Click += new System.EventHandler(this.CutToolStripMenuItem_Click);
             // 
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.copyToolStripMenuItem.Text = "Copy";
-            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.CopyToolStripMenuItem_Click);
             // 
             // pasteAboveToolStripMenuItem
             // 
             this.pasteAboveToolStripMenuItem.Name = "pasteAboveToolStripMenuItem";
             this.pasteAboveToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.pasteAboveToolStripMenuItem.Text = "Paste Above";
-            this.pasteAboveToolStripMenuItem.Click += new System.EventHandler(this.pasteAboveToolStripMenuItem_Click);
+            this.pasteAboveToolStripMenuItem.Click += new System.EventHandler(this.PasteAboveToolStripMenuItem_Click);
             // 
             // pasteBelowToolStripMenuItem
             // 
             this.pasteBelowToolStripMenuItem.Name = "pasteBelowToolStripMenuItem";
             this.pasteBelowToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.pasteBelowToolStripMenuItem.Text = "Paste Below";
-            this.pasteBelowToolStripMenuItem.Click += new System.EventHandler(this.pasteBelowToolStripMenuItem_Click);
+            this.pasteBelowToolStripMenuItem.Click += new System.EventHandler(this.PasteBelowToolStripMenuItem_Click);
             // 
             // toolStripSeparator
             // 
@@ -431,7 +431,7 @@
             this.createSQLToolStripMenuItem.Name = "createSQLToolStripMenuItem";
             this.createSQLToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.createSQLToolStripMenuItem.Text = "Create SQL";
-            this.createSQLToolStripMenuItem.Click += new System.EventHandler(this.createSQLToolStripMenuItem_Click);
+            this.createSQLToolStripMenuItem.Click += new System.EventHandler(this.CreateSQLToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -443,7 +443,7 @@
             this.makegoXyzToolStripMenuItem.Name = "makegoXyzToolStripMenuItem";
             this.makegoXyzToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.makegoXyzToolStripMenuItem.Text = "Make .go xyz";
-            this.makegoXyzToolStripMenuItem.Click += new System.EventHandler(this.makegoXyzToolStripMenuItem_Click);
+            this.makegoXyzToolStripMenuItem.Click += new System.EventHandler(this.MakegoXyzToolStripMenuItem_Click);
             // 
             // toolStripEdit
             // 
@@ -474,7 +474,7 @@
             this.toolStripButtonSearch.Size = new System.Drawing.Size(122, 36);
             this.toolStripButtonSearch.Text = "Search";
             this.toolStripButtonSearch.ToolTipText = "Fill listbox with guids of\r\nselected entry or all entries.";
-            this.toolStripButtonSearch.Click += new System.EventHandler(this.toolStripButtonSearch_Click);
+            this.toolStripButtonSearch.Click += new System.EventHandler(this.ToolStripButtonSearch_Click);
             // 
             // toolStripTextBoxEntry
             // 
@@ -511,7 +511,7 @@
             this.toolStripButtonSettings.Size = new System.Drawing.Size(137, 36);
             this.toolStripButtonSettings.Text = "Settings";
             this.toolStripButtonSettings.ToolTipText = "Setup chart and output SQL.";
-            this.toolStripButtonSettings.Click += new System.EventHandler(this.toolStripButtonSettings_Click);
+            this.toolStripButtonSettings.Click += new System.EventHandler(this.ToolStripButtonSettings_Click);
             // 
             // toolStripButtonLoadSniff
             // 
@@ -521,7 +521,7 @@
             this.toolStripButtonLoadSniff.Size = new System.Drawing.Size(178, 36);
             this.toolStripButtonLoadSniff.Text = "Import Sniff";
             this.toolStripButtonLoadSniff.ToolTipText = "Import a parsed pkt sniff file.";
-            this.toolStripButtonLoadSniff.Click += new System.EventHandler(this.toolStripButtonLoadSniff_Click);
+            this.toolStripButtonLoadSniff.Click += new System.EventHandler(this.ToolStripButtonLoadSniff_Click);
             // 
             // toolStripLabelRange
             // 
@@ -567,8 +567,8 @@
             // 
             this.makegoMidpointToolStripMenuItem.Name = "makegoMidpointToolStripMenuItem";
             this.makegoMidpointToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
-            this.makegoMidpointToolStripMenuItem.Text = "Make ,go midpoint";
-            this.makegoMidpointToolStripMenuItem.Click += new System.EventHandler(this.makegoMidpointToolStripMenuItem_Click);
+            this.makegoMidpointToolStripMenuItem.Text = "Make .go midpoint";
+            this.makegoMidpointToolStripMenuItem.Click += new System.EventHandler(this.MakegoMidpointToolStripMenuItem_Click);
             // 
             // frm_Waypoint
             // 
