@@ -159,7 +159,7 @@
             this.chkBoxLine.TabIndex = 5;
             this.chkBoxLine.Text = "Show Lines";
             this.chkBoxLine.UseVisualStyleBackColor = true;
-            this.chkBoxLine.CheckedChanged += new System.EventHandler(this.chkBoxLine_CheckedChanged);
+            this.chkBoxLine.CheckedChanged += new System.EventHandler(this.ChkBoxLine_CheckedChanged);
             // 
             // btnOK
             // 
@@ -169,7 +169,7 @@
             this.btnOK.TabIndex = 7;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
-            this.btnOK.Click += new System.EventHandler(this.btnOKClick);
+            this.btnOK.Click += new System.EventHandler(this.BtnOKClick);
             // 
             // btnCancel
             // 
@@ -180,7 +180,7 @@
             this.btnCancel.TabIndex = 8;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancelClick);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancelClick);
             // 
             // groupColours
             // 
@@ -208,7 +208,7 @@
             this.btnPointColour.TabIndex = 12;
             this.btnPointColour.Text = "Point Colour";
             this.btnPointColour.UseVisualStyleBackColor = true;
-            this.btnPointColour.Click += new System.EventHandler(this.btnPointColour_Click);
+            this.btnPointColour.Click += new System.EventHandler(this.BtnPointColour_Click);
             // 
             // btnLineColour
             // 
@@ -218,7 +218,7 @@
             this.btnLineColour.TabIndex = 13;
             this.btnLineColour.Text = "Line Colour";
             this.btnLineColour.UseVisualStyleBackColor = true;
-            this.btnLineColour.Click += new System.EventHandler(this.btnLineColour_Click);
+            this.btnLineColour.Click += new System.EventHandler(this.BtnLineColour_Click);
             // 
             // btnBackColour
             // 
@@ -228,7 +228,7 @@
             this.btnBackColour.TabIndex = 15;
             this.btnBackColour.Text = "Back Colour";
             this.btnBackColour.UseVisualStyleBackColor = true;
-            this.btnBackColour.Click += new System.EventHandler(this.btnBackColour_Click);
+            this.btnBackColour.Click += new System.EventHandler(this.BtnBackColour_Click);
             // 
             // btnTitleColour
             // 
@@ -238,7 +238,7 @@
             this.btnTitleColour.TabIndex = 17;
             this.btnTitleColour.Text = "Title Colour";
             this.btnTitleColour.UseVisualStyleBackColor = true;
-            this.btnTitleColour.Click += new System.EventHandler(this.btnTitleColour_Click);
+            this.btnTitleColour.Click += new System.EventHandler(this.BtnTitleColour_Click);
             // 
             // picBoxPointColour
             // 
@@ -284,7 +284,7 @@
             this.btnDefault.TabIndex = 10;
             this.btnDefault.Text = "Reset Default Values";
             this.btnDefault.UseVisualStyleBackColor = true;
-            this.btnDefault.Click += new System.EventHandler(this.btnDefault_Click);
+            this.btnDefault.Click += new System.EventHandler(this.BtnDefault_Click);
             // 
             // chkBoxObject
             // 

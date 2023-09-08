@@ -230,9 +230,9 @@ namespace Frm_waypoint.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public string vmangos {
+        public bool vmangos {
             get {
-                return ((string)(this["vmangos"]));
+                return ((bool)(this["vmangos"]));
             }
             set {
                 this["vmangos"] = value;

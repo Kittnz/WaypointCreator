@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Frm_waypoint
@@ -26,43 +21,43 @@ namespace Frm_waypoint
             GetValues();
         }
 
-        private void btnOKClick(object sender, EventArgs e)
+        private void BtnOKClick(object sender, EventArgs e)
         {
             SaveValues();
             this.Close();
         }
 
-        private void btnDefault_Click(object sender, EventArgs e)
+        private void BtnDefault_Click(object sender, EventArgs e)
         {
             SetDefaults();
         }
 
-        private void btnCancelClick(object sender, EventArgs e)
+        private void BtnCancelClick(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void btnPointColour_Click(object sender, EventArgs e)
+        private void BtnPointColour_Click(object sender, EventArgs e)
         {
-            setColour(boxPoint);
+            SetColour(boxPoint);
         }
 
-        private void btnLineColour_Click(object sender, EventArgs e)
+        private void BtnLineColour_Click(object sender, EventArgs e)
         {
-            setColour(boxLine);
+            SetColour(boxLine);
         }
 
-        private void btnBackColour_Click(object sender, EventArgs e)
+        private void BtnBackColour_Click(object sender, EventArgs e)
         {
-            setColour(boxBack);
+            SetColour(boxBack);
         }
 
-        private void btnTitleColour_Click(object sender, EventArgs e)
+        private void BtnTitleColour_Click(object sender, EventArgs e)
         {
-            setColour(boxTitle);
+            SetColour(boxTitle);
         }
 
-        private void setColour(int item)
+        private void SetColour(int item)
         {
             ColorDialog colorDlg    = new ColorDialog();
             colorDlg.AllowFullOpen  = true;
@@ -200,12 +195,12 @@ namespace Frm_waypoint
             picBoxTitleColour.BackColor = Color.Blue;
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
 
         }
 
-        private void chkBoxLine_CheckedChanged(object sender, EventArgs e)
+        private void ChkBoxLine_CheckedChanged(object sender, EventArgs e)
         {
 
         }

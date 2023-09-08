@@ -440,6 +440,7 @@ namespace Frm_waypoint
                                         sniff.x = packetline[move_x];
                                         sniff.y = packetline[move_y];
                                         sniff.z = packetline[move_z];
+                                        sniff.o = "100";
                                     }
                                     if (line.Contains(sniff_move_5))
                                     {
@@ -541,7 +542,9 @@ namespace Frm_waypoint
         {
             chart.BackColor = Properties.Settings.Default.BackColour;
             chart.ChartAreas[0].BackColor = Properties.Settings.Default.BackColour;
-            chart.Titles.Clear();
+            chart.ChartAreas[0].AxisX.ScaleView.ZoomReset();
+            chart.ChartAreas[0].AxisY.ScaleView.ZoomReset();
+            chart.ChartAreas[0].AxisY.IsReversed = true;
 
             if (creature_entry == "")
             {
@@ -557,12 +560,14 @@ namespace Frm_waypoint
                 if (DS.Tables["table1"].Rows.Count > 0)
                 {
                     creature_name = DS.Tables["table1"].Rows[0][0].ToString();
+                    chart.Titles.Clear();
                     Title title = chart.Titles.Add(creature_name + " Entry: " + creature_entry);
                     title.Font = new System.Drawing.Font("Arial", 16, FontStyle.Bold);
                     title.ForeColor = Properties.Settings.Default.TitleColour;
                 }
                 else
                 {
+                    chart.Titles.Clear();
                     Title title = chart.Titles.Add("Entry " + creature_entry + " not in database");
                     title.Font = new System.Drawing.Font("Arial", 16, FontStyle.Bold);
                     title.ForeColor = Properties.Settings.Default.TitleColour;
@@ -570,6 +575,7 @@ namespace Frm_waypoint
             }
             else
             {
+                chart.Titles.Clear();
                 Title title = chart.Titles.Add("Entry " + creature_entry + " database not connected");
                 title.Font = new System.Drawing.Font("Arial", 16, FontStyle.Bold);
                 title.ForeColor = Properties.Settings.Default.TitleColour;
