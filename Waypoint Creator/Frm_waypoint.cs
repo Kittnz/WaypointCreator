@@ -336,7 +336,7 @@ namespace Frm_waypoint
                 // Determine sniff version
                 if (sniffversion.Contains("V5"))
                     Sniff_version_4();
-                else if (sniffversion.Contains("V1") || sniffversion.Contains("V2") || sniffversion.Contains("V3") || (sniffversion.Contains("V4") || sniffversion.Contains("V6") || sniffversion.Contains("V7") || sniffversion.Contains("V9"))
+                else if (sniffversion.Contains("V1") || sniffversion.Contains("V2") || sniffversion.Contains("V3") || (sniffversion.Contains("V4") || sniffversion.Contains("V6") || sniffversion.Contains("V7") || sniffversion.Contains("V9")))
                     Sniff_version_6();
 
                 // Process new sniff file
@@ -477,8 +477,82 @@ namespace Frm_waypoint
                                 sniff.entry = "";
                             }
                         }
-                    }
+                        if (!string.IsNullOrEmpty(line) && Properties.Settings.Default.ObjectUpdate && line.Contains(sniff_object) && !line.Contains(sniff_object_outofrange))
+                        {
+                            sniff.entry = "";
+                            string[] values = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
+                            if (values.Length > object_time)
+                            {
+                                string[] time = values[object_time].Split(new char[] { '.' }); // Get time
+                                if (time.Length > 0)
+                                {
+                                    sniff.time = time[0];
+                                }
+                            }
+
+                            bufferIndex = 0;
+                            do
+                            {
+                                line = reader.ReadLine();
+                                if (!string.IsNullOrEmpty(line))
+                                {
+                                    buffer[bufferIndex++] = line;
+
+                                    if (line.Contains(sniff_object_outofrange))
+                                    {
+                                        break; // Exit the do-while loop to stop processing this message
+                                    }
+
+                                    if (line.Contains(sniff_object_1)) // is this GUID line
+                                    {
+                                        if (line.Contains(sniff_object_2) || line.Contains(sniff_object_3))
+                                        {
+                                            string[] packetline = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                            if (packetline.Length > object_entry && packetline.Length > object_guid)
+                                            {
+                                                sniff.entry = packetline[object_entry];
+                                                sniff.guid = packetline[object_guid];
+                                            }
+                                        }
+                                    }
+
+                                    if (line.Contains(sniff_object_4))
+                                    {
+                                        string[] packetline = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                        if (packetline.Length > object_pointz) // Checking the largest index we will access
+                                        {
+                                            sniff.x = packetline[object_pointx];
+                                            sniff.y = packetline[object_pointy];
+                                            sniff.z = packetline[object_pointz];
+                                            sniff.o = "NULL";
+                                        }
+                                        if (!string.IsNullOrEmpty(sniff.x))
+                                        {
+                                            break; // Exit the do-while loop to stop processing this message
+                                        }
+                                    }
+                                }
+                            } while (line != "" && bufferIndex < buffer.Length);
+
+                            if (!string.IsNullOrEmpty(sniff.entry))
+                            {
+                                DataRow dr = dt.NewRow();
+                                dr[0] = sniff.entry;
+                                dr[1] = sniff.guid;
+                                dr[2] = sniff.x;
+                                dr[3] = sniff.y;
+                                dr[4] = sniff.z;
+                                dr[5] = sniff.o;
+                                dr[6] = sniff.time;
+                                dr[7] = mapID;
+                                dt.Rows.Add(dr);
+                                sniff.entry = "";
+                            }
+                        }
+                    }
                 }
             }
             finally
@@ -808,6 +882,8 @@ namespace Frm_waypoint
             txtOutput.Text = txtOutput.Text + Codetext + "\r\n";
         }
 
+        private string sniff_object_outofrange = "(OutOfRange)";
+
         private void Sniff_version_4()
         {
             state_map = 2;
@@ -842,7 +918,6 @@ namespace Frm_waypoint
             sniff_object_3 = "Vehicle";
             sniff_object_4 = "Spline Waypoint: X:";
         }
-
         private void Sniff_version_6()
         {
             state_map = 1;
@@ -859,9 +934,9 @@ namespace Frm_waypoint
             object_time = 9;
             object_entry = 9;
             object_guid = 3;
-            object_pointx = 4;
-            object_pointy = 6;
-            object_pointz = 8;
+            object_pointx = 3;
+            object_pointy = 5;
+            object_pointz = 7;
             sniff_state = "SMSG_INIT_WORLD_STATES";
             sniff_move = "SMSG_ON_MONSTER_MOVE";
             sniff_move_1 = "MoverGUID: Full:";
@@ -875,7 +950,7 @@ namespace Frm_waypoint
             sniff_object_1 = "MoverGUID: Full:";
             sniff_object_2 = "Creature/0";
             sniff_object_3 = "Vehicle/0";
-            sniff_object_4 = "Endpoint: X:";
+            sniff_object_4 = "Position: X:"; // Updated to match the line containing coordinates
         }
 
         private void Findrange()
