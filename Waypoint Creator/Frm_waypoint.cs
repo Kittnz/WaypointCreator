@@ -334,9 +334,9 @@ namespace Frm_waypoint
             if (filetype == "# TrinityCore - WowPacketParser")
             {
                 // Determine sniff version
-                if (sniffversion.Contains("V4") || sniffversion.Contains("V5"))
+                if (sniffversion.Contains("V5"))
                     Sniff_version_4();
-                else if (sniffversion.Contains("V1") || sniffversion.Contains("V2") || sniffversion.Contains("V3") || sniffversion.Contains("V6") || sniffversion.Contains("V7") || sniffversion.Contains("V9"))
+                else if (sniffversion.Contains("V1") || sniffversion.Contains("V2") || sniffversion.Contains("V3") || (sniffversion.Contains("V4") || sniffversion.Contains("V6") || sniffversion.Contains("V7") || sniffversion.Contains("V9"))
                     Sniff_version_6();
 
                 // Process new sniff file
@@ -812,7 +812,7 @@ namespace Frm_waypoint
         {
             state_map = 2;
             move_time = 9;
-            move_entry = 8;
+            move_entry = 6;
             move_guid = 2;
             move_x = 2;
             move_y = 4;
