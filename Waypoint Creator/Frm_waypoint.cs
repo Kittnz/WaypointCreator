@@ -812,7 +812,7 @@ namespace Frm_waypoint
         {
             state_map = 2;
             move_time = 9;
-            move_entry = 6;
+            move_entry = 8;
             move_guid = 2;
             move_x = 2;
             move_y = 4;
