@@ -1,6 +1,6 @@
-# ![logo](images/Fire%20Elemental.png) Waypoint Creator for vmangos
+# ![logo](images/Fire%20Elemental.png) Waypoint Creator for VMaNGOS
 
-This fork of Waypoint Creator supports vmangos and has been improved to handle large sniffs better.
+This fork of Waypoint Creator supports VMaNGOS and has been improved to handle large sniffs better.
 
 Used to create paths for NPCs on WoW private servers.
 Note: This software requires a parsed packet file to work.
