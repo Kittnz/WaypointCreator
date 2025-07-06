@@ -83,6 +83,14 @@ namespace Frm_waypoint
 
         private async void ToolStripButtonLoadSniff_Click(object sender, EventArgs e)
         {
+            openFileDialog.Title = "Open File";
+            openFileDialog.Filter = "Parsed Sniff File (*.txt)|*.txt";
+            openFileDialog.FileName = "*.txt";
+            openFileDialog.FilterIndex = 1;
+            openFileDialog.ShowReadOnly = false;
+            openFileDialog.Multiselect = false;
+            openFileDialog.CheckFileExists = true;
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog.FileName;
