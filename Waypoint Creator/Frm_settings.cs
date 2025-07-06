@@ -87,29 +87,26 @@ namespace Frm_waypoint
 
         private void GetValues()
         {
-            if (Properties.Settings.Default.DB == true)
-                chkBoxDB.CheckState = CheckState.Checked;
+            if (Properties.Settings.Default.vmangos == true)
+                chkBoxVMaNGOS.CheckState = CheckState.Checked;
             else
-                chkBoxDB.CheckState = CheckState.Unchecked;
+                chkBoxVMaNGOS.CheckState = CheckState.Unchecked;
 
-            if (Properties.Settings.Default.UDB == true)
-                chkBoxUDB.CheckState = CheckState.Checked;
+            if (Properties.Settings.Default.cmangos == true)
+                chkBoxCMaNGOS.CheckState = CheckState.Checked;
             else
-                chkBoxUDB.CheckState = CheckState.Unchecked;
+                chkBoxCMaNGOS.CheckState = CheckState.Unchecked;
 
-            if (Properties.Settings.Default.SAI == true)
-                chkBoxSAI.CheckState = CheckState.Checked;
+            if (Properties.Settings.Default.trinitycore == true)
+                chkBoxTrinityCore.CheckState = CheckState.Checked;
             else
-                chkBoxSAI.CheckState = CheckState.Unchecked;
+                chkBoxTrinityCore.CheckState = CheckState.Unchecked;
 
             if (Properties.Settings.Default.CPP == true)
                 chkBoxCPP.CheckState = CheckState.Checked;
             else
                 chkBoxCPP.CheckState = CheckState.Unchecked;
-            if (Properties.Settings.Default.vmangos == true)
-                chkBoxvmangos.CheckState = CheckState.Checked;
-            else
-                chkBoxvmangos.CheckState = CheckState.Unchecked;
+
             if (Properties.Settings.Default.Lines == true)
                 chkBoxLine.CheckState = CheckState.Checked;
             else
@@ -120,11 +117,6 @@ namespace Frm_waypoint
             else
                 chkBoxSpline.CheckState = CheckState.Unchecked;
 
-            if (Properties.Settings.Default.ObjectUpdate == true)
-                chkBoxObject.CheckState = CheckState.Checked;
-            else
-                chkBoxObject.CheckState = CheckState.Unchecked;
-
             picBoxPointColour.BackColor = Properties.Settings.Default.PointColour;
             picBoxLineColour.BackColor = Properties.Settings.Default.LineColour;
             picBoxBackColour.BackColor = Properties.Settings.Default.BackColour;
@@ -133,30 +125,25 @@ namespace Frm_waypoint
 
         private void SaveValues()
         {
-            if (chkBoxDB.CheckState == CheckState.Checked)
-                Properties.Settings.Default.DB = true;
+            if (chkBoxVMaNGOS.CheckState == CheckState.Checked)
+                Properties.Settings.Default.vmangos = true;
             else
-                Properties.Settings.Default.DB = false;
+                Properties.Settings.Default.vmangos = false;
 
-            if (chkBoxUDB.CheckState == CheckState.Checked)
-                Properties.Settings.Default.UDB = true;
+            if (chkBoxCMaNGOS.CheckState == CheckState.Checked)
+                Properties.Settings.Default.cmangos = true;
             else
-                Properties.Settings.Default.UDB = false;
+                Properties.Settings.Default.cmangos = false;
 
-            if (chkBoxSAI.CheckState == CheckState.Checked)
-                Properties.Settings.Default.SAI = true;
+            if (chkBoxTrinityCore.CheckState == CheckState.Checked)
+                Properties.Settings.Default.trinitycore = true;
             else
-                Properties.Settings.Default.SAI = false;
+                Properties.Settings.Default.trinitycore = false;
 
             if (chkBoxCPP.CheckState == CheckState.Checked)
                 Properties.Settings.Default.CPP = true;
             else
                 Properties.Settings.Default.CPP = false;
-
-            if (chkBoxvmangos.CheckState == CheckState.Checked)
-                Properties.Settings.Default.vmangos = true;
-            else
-                Properties.Settings.Default.vmangos = false;
 
             if (chkBoxLine.CheckState == CheckState.Checked)
                 Properties.Settings.Default.Lines = true;
@@ -168,11 +155,6 @@ namespace Frm_waypoint
             else
                 Properties.Settings.Default.Splines = false;
 
-            if (chkBoxObject.CheckState == CheckState.Checked)
-                Properties.Settings.Default.ObjectUpdate = true;
-            else
-                Properties.Settings.Default.ObjectUpdate = false;
-
             Properties.Settings.Default.PointColour = picBoxPointColour.BackColor;
             Properties.Settings.Default.LineColour = picBoxLineColour.BackColor;
             Properties.Settings.Default.BackColour = picBoxBackColour.BackColor;
@@ -182,11 +164,10 @@ namespace Frm_waypoint
 
         private void SetDefaults()
         {
-            chkBoxDB.CheckState = CheckState.Checked;
-            chkBoxUDB.CheckState = CheckState.Unchecked;
-            chkBoxSAI.CheckState = CheckState.Unchecked;
+            chkBoxVMaNGOS.CheckState = CheckState.Checked;
+            chkBoxCMaNGOS.CheckState = CheckState.Unchecked;
+            chkBoxTrinityCore.CheckState = CheckState.Unchecked;
             chkBoxCPP.CheckState = CheckState.Unchecked;
-            chkBoxvmangos.CheckState = CheckState.Unchecked;
             chkBoxLine.CheckState = CheckState.Checked;
             chkBoxSpline.CheckState = CheckState.Unchecked;
             picBoxPointColour.BackColor = Color.Blue;
@@ -195,14 +176,44 @@ namespace Frm_waypoint
             picBoxTitleColour.BackColor = Color.Blue;
         }
 
-        private void CheckBox1_CheckedChanged(object sender, EventArgs e)
+        private void SQLFormat_CheckedChanged(object sender, EventArgs e)
         {
+            CheckBox clickedCheckbox = (CheckBox)sender;
 
+            if (clickedCheckbox.Checked)
+            {
+                // Uncheck all other checkboxes
+                foreach (Control control in groupSQL.Controls)
+                {
+                    if (control is CheckBox && control != clickedCheckbox)
+                    {
+                        ((CheckBox)control).Checked = false;
+                    }
+                }
+            }
+            else
+            {
+                // If unchecking, ensure at least one remains checked
+                bool anyChecked = chkBoxVMaNGOS.Checked || chkBoxCMaNGOS.Checked ||
+                                 chkBoxTrinityCore.Checked || chkBoxCPP.Checked;
+
+                if (!anyChecked)
+                {
+                    clickedCheckbox.Checked = true; // Re-check the box if none are checked
+                }
+            }
         }
 
         private void ChkBoxLine_CheckedChanged(object sender, EventArgs e)
         {
+            // Enable/disable the spline checkbox based on the "Show Lines" state
+            chkBoxSpline.Enabled = chkBoxLine.Checked;
 
+            // If "Show Lines" is being unchecked, also uncheck "Linetype Spline"
+            if (!chkBoxLine.Checked)
+            {
+                chkBoxSpline.Checked = false;
+            }
         }
     }
 }

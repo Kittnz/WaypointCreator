@@ -6,13 +6,13 @@
       <Value Profile="(Default)">localhost</Value>
     </Setting>
     <Setting Name="database" Type="System.String" Scope="User">
-      <Value Profile="(Default)">world</Value>
+      <Value Profile="(Default)">mangos</Value>
     </Setting>
     <Setting Name="username" Type="System.String" Scope="User">
-      <Value Profile="(Default)">trinity</Value>
+      <Value Profile="(Default)">root</Value>
     </Setting>
     <Setting Name="password" Type="System.String" Scope="User">
-      <Value Profile="(Default)">trinity</Value>
+      <Value Profile="(Default)">root</Value>
     </Setting>
     <Setting Name="port" Type="System.String" Scope="User">
       <Value Profile="(Default)">3306</Value>
@@ -21,12 +21,6 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Splines" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="DB" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="UDB" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="PointColour" Type="System.Drawing.Color" Scope="User">
@@ -44,10 +38,13 @@
     <Setting Name="UsingDB" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="ObjectUpdate" Type="System.Boolean" Scope="User">
+    <Setting Name="vmangos" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="cmangos" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="SAI" Type="System.Boolean" Scope="User">
+    <Setting Name="trinitycore" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="CPP" Type="System.Boolean" Scope="User">

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Xml.Linq;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace Frm_waypoint
 {

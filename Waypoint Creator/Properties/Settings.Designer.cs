@@ -12,7 +12,7 @@ namespace Frm_waypoint.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -37,7 +37,7 @@ namespace Frm_waypoint.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("world")]
+        [global::System.Configuration.DefaultSettingValueAttribute("mangos")]
         public string database {
             get {
                 return ((string)(this["database"]));
@@ -49,7 +49,7 @@ namespace Frm_waypoint.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("trinity")]
+        [global::System.Configuration.DefaultSettingValueAttribute("root")]
         public string username {
             get {
                 return ((string)(this["username"]));
@@ -61,7 +61,7 @@ namespace Frm_waypoint.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("trinity")]
+        [global::System.Configuration.DefaultSettingValueAttribute("root")]
         public string password {
             get {
                 return ((string)(this["password"]));
@@ -104,30 +104,6 @@ namespace Frm_waypoint.Properties {
             }
             set {
                 this["Splines"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool DB {
-            get {
-                return ((bool)(this["DB"]));
-            }
-            set {
-                this["DB"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool UDB {
-            get {
-                return ((bool)(this["UDB"]));
-            }
-            set {
-                this["UDB"] = value;
             }
         }
         
@@ -193,25 +169,37 @@ namespace Frm_waypoint.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ObjectUpdate {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool vmangos {
             get {
-                return ((bool)(this["ObjectUpdate"]));
+                return ((bool)(this["vmangos"]));
             }
             set {
-                this["ObjectUpdate"] = value;
+                this["vmangos"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool SAI {
+        public bool cmangos {
             get {
-                return ((bool)(this["SAI"]));
+                return ((bool)(this["cmangos"]));
             }
             set {
-                this["SAI"] = value;
+                this["cmangos"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool trinitycore {
+            get {
+                return ((bool)(this["trinitycore"]));
+            }
+            set {
+                this["trinitycore"] = value;
             }
         }
         
@@ -224,18 +212,6 @@ namespace Frm_waypoint.Properties {
             }
             set {
                 this["CPP"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool vmangos {
-            get {
-                return ((bool)(this["vmangos"]));
-            }
-            set {
-                this["vmangos"] = value;
             }
         }
     }
