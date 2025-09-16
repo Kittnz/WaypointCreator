@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SkiaSharp;
+using SkiaSharp.Views.Desktop;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -9,7 +11,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Frm_waypoint
 {
@@ -29,6 +30,19 @@ namespace Frm_waypoint
 
         float midX = 0;
         float midY = 0;
+
+        private SKGLControl _mapControl;
+
+        private readonly WowMapProvider _mapProvider = new WowMapProvider();
+
+        private bool _isDragging = false;
+        private Point _lastMousePosition;
+        private float _zoomSensitivity = 0.1f;
+        private float _minZoom = 0.1f;
+        private float _maxZoom = 10f;
+        private SKColor _backgroundColor = SKColors.LightGray;
+        private List<string[]> _clip = new List<string[]>();
+        private List<string> _originalListBoxItems = new List<string>();
 
         struct Packet
         {
@@ -68,12 +82,145 @@ namespace Frm_waypoint
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
             InitializeComponent();
+
+            MapManager.Initialize(Path.Combine("world", "minimaps"));
+            MapManager.LoadMaps(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "map.csv"));
+
+            _mapControl = skiaMapControl;
+            _mapControl.PaintSurface += MapControl_PaintSurface;
+
+            _mapProvider = new WowMapProvider();
+
+            // Set initial map
+            _mapProvider.LoadMap(-1);
+
+            _mapControl.MouseDown += MapControl_MouseDown;
+            _mapControl.MouseMove += MapControl_MouseMove;
+            _mapControl.MouseUp += MapControl_MouseUp;
+            _mapControl.MouseWheel += MapControl_MouseWheel;
+
+            toolStripTextBoxEntry.KeyDown += ToolStripTextBoxEntry_KeyDown;
         }
 
-        private void Frm_waypoint_Load(object sender, EventArgs e)
+        private void MapControl_MouseDown(object sender, MouseEventArgs e)
         {
-            chart.BackColor = Properties.Settings.Default.BackColour;
-            chart.ChartAreas[0].BackColor = Properties.Settings.Default.BackColour;
+            if (e.Button == MouseButtons.Left)
+            {
+                _isDragging = true;
+                _lastMousePosition = e.Location;
+                _mapControl.Cursor = Cursors.Hand;
+            }
+        }
+
+        private void MapControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isDragging)
+            {
+                var delta = new Point(e.Location.X - _lastMousePosition.X, e.Location.Y - _lastMousePosition.Y);
+
+                // Convert screen delta to world delta
+                var worldDelta = new PointF(
+                    delta.X / _mapProvider.Zoom,
+                    delta.Y / _mapProvider.Zoom
+                );
+
+                // Calculate new center position
+                var newCenter = new PointF(
+                    _mapProvider.Center.X - worldDelta.X,
+                    _mapProvider.Center.Y - worldDelta.Y
+                );
+
+                // Constrain to map bounds
+                var mapBounds = _mapProvider.GetMapBounds();
+                var visibleRect = GetVisibleWorldRect();
+
+                // Calculate maximum allowed center position
+                float maxCenterX = mapBounds.Right - (visibleRect.Width / 2);
+                float minCenterX = mapBounds.Left + (visibleRect.Width / 2);
+                float maxCenterY = mapBounds.Bottom - (visibleRect.Height / 2);
+                float minCenterY = mapBounds.Top + (visibleRect.Height / 2);
+
+                newCenter.X = Math.Max(minCenterX, Math.Min(maxCenterX, newCenter.X));
+                newCenter.Y = Math.Max(minCenterY, Math.Min(maxCenterY, newCenter.Y));
+
+                _mapProvider.Center = newCenter;
+                _lastMousePosition = e.Location;
+                _mapControl.Invalidate();
+            }
+        }
+
+        private void MapControl_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                _isDragging = false;
+                _mapControl.Cursor = Cursors.Default;
+            }
+        }
+
+        private void MapControl_MouseWheel(object sender, MouseEventArgs e)
+        {
+            // Get mouse position relative to control
+            var mousePos = e.Location;
+
+            // Get world position before zoom
+            var worldPos = ScreenToWorld(mousePos);
+
+            float zoomDelta = e.Delta > 0 ? _zoomSensitivity : -_zoomSensitivity;
+            float newZoom = _mapProvider.Zoom + zoomDelta;
+            _mapProvider.Zoom = Math.Max(_minZoom, Math.Min(newZoom, _maxZoom));
+
+            // Get world position after zoom
+            var newWorldPos = ScreenToWorld(mousePos);
+
+            // Adjust center to keep mouse position stable
+            _mapProvider.Center = new PointF(
+                _mapProvider.Center.X + (worldPos.X - newWorldPos.X),
+                _mapProvider.Center.Y + (worldPos.Y - newWorldPos.Y)
+            );
+
+            _mapControl.Invalidate();
+        }
+
+        private void MapControl_PaintSurface(object sender, SKPaintGLSurfaceEventArgs e)
+        {
+            var canvas = e.Surface.Canvas;
+
+            _backgroundColor = new SKColor(
+                Properties.Settings.Default.BackColour.R,
+                Properties.Settings.Default.BackColour.G,
+                Properties.Settings.Default.BackColour.B
+                );
+
+            canvas.Clear(_backgroundColor);
+
+            // Get map bounds in world coordinates
+            var mapBounds = _mapProvider.GetMapBounds();
+
+            // Apply clipping to prevent rendering outside map bounds
+            using (new SKAutoCanvasRestore(canvas))
+            {
+                ApplyViewTransform(canvas);
+
+                // Clip to map bounds
+                canvas.ClipRect(mapBounds);
+
+                DrawTiles(canvas);
+                DrawPaths(canvas);
+                DrawMarkers(canvas);
+            }
+        }
+
+        private PointF ScreenToWorld(Point screenPoint)
+        {
+            int vw = _mapControl.Width;
+            int vh = _mapControl.Height;
+
+            // Reverse transformation pipeline
+            float worldX = (screenPoint.X - vw / 2f) / _mapProvider.Zoom;
+            float worldY = -(screenPoint.Y - vh / 2f) / _mapProvider.Zoom;
+
+            return new PointF(worldX, worldY);
         }
 
         private void Frm_waypoint_FormClosing(object sender, FormClosingEventArgs e)
@@ -88,30 +235,267 @@ namespace Frm_waypoint
             openFileDialog.FileName = "*.txt";
             openFileDialog.FilterIndex = 1;
             openFileDialog.ShowReadOnly = false;
-            openFileDialog.Multiselect = false;
+            openFileDialog.Multiselect = true;
             openFileDialog.CheckFileExists = true;
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string fileName = openFileDialog.FileName;
-                toolStripStatusLabel.Text = "Loading File...";
+                string[] fileNames = openFileDialog.FileNames;
+                toolStripStatusLabel.Text = "Loading Files...";
                 this.Cursor = Cursors.WaitCursor;
 
                 try
                 {
-                    await Task.Run(() => LoadSniffFileIntoDatatable(fileName));
+                    waypoints.Clear();
+
+                    await Task.Run(() =>
+                    {
+                        foreach (string fileName in fileNames)
+                        {
+                            LoadSniffFileIntoDatatable(fileName);
+                        }
+                    });
+
                     toolStripTextBoxEntry.Enabled = true;
                     toolStripButtonSearch.Enabled = true;
-                    toolStripStatusLabel.Text = fileName + " is selected for input.";
+                    toolStripStatusLabel.Text = $"{fileNames.Length} files selected for input.";
+
+                    FillListBoxWithGuids("0");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error loading file: {ex.Message}", "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Error loading files: {ex.Message}", "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
                     this.Cursor = Cursors.Default;
                 }
+            }
+        }
+
+        private readonly List<PathData> _paths = new List<PathData>();
+        private readonly List<MarkerData> _markers = new List<MarkerData>();
+
+        private class PathData
+        {
+            public SKPath Path { get; set; }
+            public SKPaint Paint { get; set; }
+        }
+
+        private class MarkerData
+        {
+            public SKPoint Position { get; set; }
+            public SKPaint Paint { get; set; }
+            public string Label { get; set; }
+        }
+
+        private void ApplyViewTransform(SKCanvas canvas)
+        {
+            int vw = _mapControl.Width;
+            int vh = _mapControl.Height;
+
+            canvas.Translate(vw / 2f, vh / 2f);  // Center viewport
+            canvas.Scale(_mapProvider.Zoom);
+            canvas.Scale(1, 1);
+            canvas.Translate(-_mapProvider.Center.X, -_mapProvider.Center.Y);
+        }
+
+        private void DrawTiles(SKCanvas canvas)
+        {
+            if (!_mapProvider.IsMapLoaded) return;
+
+            // Get visible area in world coordinates
+            var visibleRect = GetVisibleWorldRect();
+
+            foreach (var tile in _mapProvider.GetTiles())
+            {
+                var tileRect = _mapProvider.GetTileWorldRect(tile.X, tile.Y);
+
+                // Only draw tiles that intersect with visible area
+                if (tileRect.IntersectsWith(visibleRect))
+                {
+                    var bitmap = _mapProvider.LoadTile(tile);
+                    if (bitmap != null)
+                    {
+                        canvas.DrawBitmap(bitmap, tileRect);
+                    }
+                }
+            }
+        }
+
+        private SKRect GetVisibleWorldRect()
+        {
+            int vw = _mapControl.Width;
+            int vh = _mapControl.Height;
+
+            // Calculate visible area in world coordinates
+            float halfWidth = (vw / 2f) / _mapProvider.Zoom;
+            float halfHeight = (vh / 2f) / _mapProvider.Zoom;
+
+            return new SKRect(
+                _mapProvider.Center.X - halfWidth,
+                _mapProvider.Center.Y - halfHeight,
+                _mapProvider.Center.X + halfWidth,
+                _mapProvider.Center.Y + halfHeight
+            );
+        }
+
+        private void DrawPaths(SKCanvas canvas)
+        {
+            var pathPaint = new SKPaint
+            {
+                Color = new SKColor(
+                    Properties.Settings.Default.LineColour.R,
+                    Properties.Settings.Default.LineColour.G,
+                    Properties.Settings.Default.LineColour.B
+                ),
+                StrokeWidth = 2,
+                IsStroke = true,
+                IsAntialias = true
+            };
+
+            foreach (var pathData in _paths)
+            {
+                pathData.Paint = pathPaint;
+                canvas.DrawPath(pathData.Path, pathData.Paint);
+            }
+        }
+
+        private void DrawMarkers(SKCanvas canvas)
+        {
+            if (_mapProvider.Zoom < 0.3f || _markers.Count == 0)
+                return;
+
+            var markerPaint = new SKPaint
+            {
+                Color = new SKColor(
+                    Properties.Settings.Default.PointColour.R,
+                    Properties.Settings.Default.PointColour.G,
+                    Properties.Settings.Default.PointColour.B
+                ),
+                IsAntialias = true,
+                Style = SKPaintStyle.Fill
+            };
+
+            var linePaint = new SKPaint
+            {
+                Color = new SKColor(
+                    Properties.Settings.Default.LineColour.R,
+                    Properties.Settings.Default.LineColour.G,
+                    Properties.Settings.Default.LineColour.B
+                ),
+                StrokeWidth = 2,
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke
+            };
+
+            var fontStyle = new SKFontStyle(
+                SKFontStyleWeight.Bold,
+                SKFontStyleWidth.Normal,
+                SKFontStyleSlant.Upright
+            );
+
+            var textFont = new SKFont(SKTypeface.FromFamilyName("Arial", fontStyle), 8);
+
+            var textLinePaint = new SKPaint
+            {
+                Color = new SKColor(
+                    Properties.Settings.Default.ConnectorLineColour.R,
+                    Properties.Settings.Default.ConnectorLineColour.G,
+                    Properties.Settings.Default.ConnectorLineColour.B
+                ),
+                StrokeWidth = 0.75f,
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke,
+                PathEffect = SKPathEffect.CreateDash(new float[] { 2f, 2f }, 0)
+            };
+
+            const float markerRadius = 2.5f;
+            const float baseSpacing = 20f;
+            const int maxLabelsToShow = 5;
+            const float minAngleIncrement = 60f * (float)Math.PI / 180f;
+
+            // Draw connecting lines between waypoints
+            if (_markers.Count > 1)
+            {
+                using (var path = new SKPath())
+                {
+                    path.MoveTo(_markers[0].Position);
+                    for (int i = 1; i < _markers.Count; i++)
+                    {
+                        path.LineTo(_markers[i].Position);
+                    }
+                    canvas.DrawPath(path, linePaint);
+                }
+            }
+
+            var positionGroups = _markers
+                .Select((m, i) => new { Marker = m, Index = i + 1 })
+                .GroupBy(x => new { X = (int)x.Marker.Position.X, Y = (int)x.Marker.Position.Y })
+                .ToList();
+
+            foreach (var group in positionGroups)
+            {
+                var items = group.ToList();
+                var count = items.Count;
+                var center = items[0].Marker.Position;
+
+                // Draw markers
+                foreach (var item in items)
+                {
+                    canvas.DrawCircle(center, markerRadius, markerPaint);
+                }
+
+                // Draw labels
+                if (count == 1)
+                {
+                    DrawLabel(canvas, items[0].Index.ToString(), center, textFont, textLinePaint, baseSpacing);
+                }
+                else if (count <= maxLabelsToShow)
+                {
+                    float radius = baseSpacing * (1 + count * 0.15f);
+                    float angleIncrement = Math.Max(minAngleIncrement, (2 * (float)Math.PI) / count);
+                    float currentAngle = (float)Math.PI / 2;
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        var labelPos = new SKPoint(
+                            center.X + radius * (float)Math.Cos(currentAngle),
+                            center.Y - radius * (float)Math.Sin(currentAngle)
+                        );
+
+                        canvas.DrawLine(center.X, center.Y, labelPos.X, labelPos.Y, textLinePaint);
+                        DrawTextWithShadow(canvas, items[i].Index.ToString(), labelPos, textFont);
+                        currentAngle += angleIncrement;
+                    }
+                }
+            }
+        }
+
+        private void DrawLabel(SKCanvas canvas, string label, SKPoint center,
+                              SKFont textFont, SKPaint linePaint, float offset)
+        {
+            var labelPos = new SKPoint(center.X, center.Y - offset);
+            canvas.DrawLine(center.X, center.Y, labelPos.X, labelPos.Y, linePaint);
+            DrawTextWithShadow(canvas, label, labelPos, textFont);
+        }
+
+        private void DrawTextWithShadow(SKCanvas canvas, string text, SKPoint position, SKFont font)
+        {
+            var textColor = new SKColor(
+                Properties.Settings.Default.TitleColour.R,
+                Properties.Settings.Default.TitleColour.G,
+                Properties.Settings.Default.TitleColour.B
+            );
+
+            using (var textPaint = new SKPaint { Color = textColor, IsAntialias = true })
+            using (var shadowPaint = new SKPaint { Color = SKColors.Black.WithAlpha(0xAA), IsAntialias = true })
+            {
+                // Draw shadow with center alignment
+                canvas.DrawText(text, position.X + 1, position.Y + 1, SKTextAlign.Center, font, shadowPaint);
+
+                // Draw main text with center alignment
+                canvas.DrawText(text, position.X, position.Y, SKTextAlign.Center, font, textPaint);
             }
         }
 
@@ -139,7 +523,6 @@ namespace Frm_waypoint
             }
             else
             {
-                // This code runs if the dialog was cancelled
                 return;
             }
         }
@@ -148,50 +531,114 @@ namespace Frm_waypoint
         {
             try
             {
-                string temp = "0";
-                if (toolStripTextBoxEntry.Text == "" || toolStripTextBoxEntry.Text == null)
+                string searchTerm = toolStripTextBoxEntry.Text?.Trim() ?? "";
+
+                if (string.IsNullOrEmpty(searchTerm))
                 {
-                    FillListBoxWithGuids(temp);
+                    // If search is empty, restore the original list
+                    if (_originalListBoxItems.Count > 0)
+                    {
+                        listBox.DataSource = _originalListBoxItems;
+                        listBox.Refresh();
+                    }
                 }
                 else
                 {
-                    temp = toolStripTextBoxEntry.Text;
-                    FillListBoxWithGuids(temp);
+                    // Store the current list as original if this is the first search
+                    if (_originalListBoxItems.Count == 0 && listBox.Items.Count > 0)
+                    {
+                        _originalListBoxItems = listBox.Items.Cast<string>().ToList();
+                    }
+
+                    // Search through the original list for entry or name matches
+                    string searchTermLower = searchTerm.ToLowerInvariant();
+                    var filteredItems = new List<string>();
+
+                    foreach (string item in _originalListBoxItems)
+                    {
+                        // Extract entry and name parts (format: "Entry - Name (LowGuid)")
+                        string[] parts = item.Split(new[] { " - ", " (" }, StringSplitOptions.RemoveEmptyEntries);
+
+                        if (parts.Length >= 2)
+                        {
+                            string entry = parts[0].Trim();
+                            string name = parts[1].Trim();
+
+                            // Check if either entry OR name matches
+                            if (entry.ToLowerInvariant() == searchTermLower ||
+                                name.ToLowerInvariant().Contains(searchTermLower))
+                            {
+                                filteredItems.Add(item);
+                            }
+                        }
+                    }
+
+                    if (filteredItems.Count == 0)
+                    {
+                        MessageBox.Show($"No matches found for '{searchTerm}'",
+                            "No Results", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        // Keep current items (the original list)
+                        listBox.DataSource = _originalListBoxItems;
+                        listBox.Refresh();
+                    }
+                    else
+                    {
+                        listBox.DataSource = filteredItems;
+                        listBox.Refresh();
+                    }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Please provide number or leave blank.", "Entry Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                MessageBox.Show("Error during search: " + ex.Message,
+                    "Search Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
+        private void ToolStripTextBoxEntry_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                ToolStripButtonSearch_Click(sender, e);
             }
         }
 
         private void ToolStripButtonSettings_Click(object sender, EventArgs e)
         {
-            // Show Settings dialog
             System.Windows.Forms.Form Frm_settings = new frm_Settings();
             Frm_settings.ShowDialog();
-            GraphPath();
+            PlotCurrentWaypoints();
         }
 
         private void ListBox_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            if (listBox.SelectedItem == null) return;
+            Console.WriteLine("ListBox selection changed!");
+            if (listBox.SelectedItem == null)
+            {
+                Console.WriteLine("No item selected");
+                return;
+            }
 
             string selectedText = listBox.SelectedItem.ToString();
+            Console.WriteLine($"Selected: {selectedText}");
+
             string[] parts = selectedText.Split(new[] { " - ", " (" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length >= 3)
             {
                 creature_entry = parts[0];
                 creature_name = parts[1];
-
-                // Find the full GUID that corresponds to this low GUID display
                 string displayedLowGuid = parts[2].TrimEnd(')');
+
+                Console.WriteLine($"Parsed - Entry: {creature_entry}, Name: {creature_name}, LowGuid: {displayedLowGuid}");
+
                 creature_guid = FindFullGuidByLowGuid(displayedLowGuid, creature_entry);
+                Console.WriteLine($"Full GUID: {creature_guid}");
             }
 
             FillGrid();
-            GraphPath();
+            PlotCurrentWaypoints();
         }
 
         private string FindFullGuidByLowGuid(string lowGuid, string entry)
@@ -206,39 +653,28 @@ namespace Frm_waypoint
                     return ExtractFullGuid(row.Field<string>(1));
                 }
             }
-            return lowGuid; // Fallback
+            return lowGuid;
         }
 
         private void CutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Cut selected fields from grid.
-            CopyCutFromGrid(true);
+            CopySelection();
+            DeleteSelection();
         }
 
         private void CopyToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Copy selected fields from grid.
-            CopyCutFromGrid(false);
-        }
+            => CopySelection();
 
-        private void PasteAboveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Paste cut or copied data into grid above selected row.
-            PasteToGrid(true);
-        }
+        private void PasteToolStripMenuItem_Click(object sender, EventArgs e)
+            => PasteSelection();
 
-        private void PasteBelowToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Paste cut or copied data into grid below selected row.
-            PasteToGrid(false);
-        }
+        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
+            => DeleteSelection();
 
         private void CreateSQLToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Store the current output
             string currentOutput = txtOutput.Text;
 
-            // Generate new SQL and append it
             if (Properties.Settings.Default.vmangos)
                 currentOutput += GenerateSQL_vmangos();
             if (Properties.Settings.Default.trinitycore)
@@ -248,7 +684,6 @@ namespace Frm_waypoint
             if (Properties.Settings.Default.CPP)
                 currentOutput += GenerateCode_cpp();
 
-            // Update the output
             txtOutput.Text = currentOutput;
         }
         private void MakegoXyzToolStripMenuItem_Click(object sender, EventArgs e)
@@ -258,82 +693,163 @@ namespace Frm_waypoint
             Clipboard.SetText(go);
         }
 
-        private void CopyCutFromGrid(bool cut)
+        private void PlotCurrentWaypoints()
         {
-            // Copy selected fields from grid and cut if cut is true.
-            copiedRows.Tables.Clear();
-            copiedRows.Tables.Add();
-            copiedRows.Tables[0].Columns.AddRange(new DataColumn[6] { new DataColumn("x", typeof(string)), new DataColumn("y", typeof(string)), new DataColumn("z", typeof(string)), new DataColumn("o", typeof(string)), new DataColumn("time", typeof(string)), new DataColumn("delay", typeof(string)) });
-
-            foreach (DataGridViewRow row in gridWaypoint.SelectedRows)
+            if (gridWaypoint.RowCount == 0)
             {
-                copiedRows.Tables[0].Rows.Add(row.Cells[1].Value, row.Cells[2].Value, row.Cells[3].Value, row.Cells[4].Value, row.Cells[5].Value, row.Cells[6].Value);
-                if (cut)
-                    gridWaypoint.Rows.Remove(row);
+                Console.WriteLine("[DEBUG] PlotCurrentWaypoints: grid is empty");
+                return;
             }
 
-            if (cut)
-            {
-                for (var l = 0; l < gridWaypoint.Rows.Count; l++)
-                    gridWaypoint[0, l].Value = l + 1;
+            Console.WriteLine($"[DEBUG] PlotCurrentWaypoints: Current mapID={mapID}");
 
-                GraphPath();
-                Findrange();
+            if (!int.TryParse(mapID, out int mapId))
+            {
+                Console.WriteLine($"[WARN] Invalid mapID '{mapID}', using fallback map 0");
+                mapId = 0;
             }
+
+            _mapProvider.LoadMap(mapId);
+
+            if (!_mapProvider.IsMapLoaded)
+            {
+                MessageBox.Show($"Map {mapId} could not be loaded", "Map Error",
+                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Collect waypoints in game coordinates
+            var gameWaypoints = new List<PointF>();
+            for (int i = 0; i < gridWaypoint.RowCount; i++)
+            {
+                try
+                {
+                    float x = float.Parse(gridWaypoint[1, i].Value.ToString());
+                    float y = float.Parse(gridWaypoint[2, i].Value.ToString());
+                    gameWaypoints.Add(new PointF(x, y));
+                    Console.WriteLine($"[DEBUG] Game waypoint {i}: X={x}, Y={y}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ERROR] Failed to parse waypoint {i}: {ex.Message}");
+                }
+            }
+
+            LoadNpcPath(mapId, gameWaypoints);
         }
 
-        private void PasteToGrid(bool above)
+        public PointF TileToWorldCoords(int tileX, int tileY)
         {
-            // Paste copiedRows into table
-            pasteTable.Tables.Clear();
-            pasteTable.Tables.Add();
-            pasteTable.Tables[0].Columns.AddRange(new DataColumn[6] {new DataColumn("x", typeof(string)), new DataColumn("y", typeof(string)),
-                            new DataColumn("z", typeof(string)), new DataColumn("o",typeof(string)), new DataColumn("time",typeof(string)), new DataColumn("delay",typeof(string)) });
+            const float tileSize = 533.3333f;
+            const float mapSize = 34133.33f;
+            float worldX = (tileX * tileSize) - (mapSize / 2) + (tileSize / 2);
+            float worldY = (tileY * tileSize) - (mapSize / 2) + (tileSize / 2);
+            Console.WriteLine($"TileToWorldCoords: Input tile ({tileX},{tileY}) -> World coords ({worldX:F3},{worldY:F3})");
+            return new PointF(worldX, worldY);
+        }
 
-            int selected = gridWaypoint.SelectedRows[0].Index;
-
-            // If the selected row is not the first row copy all rows above it to pasteTable
-            if (selected > 0)
+        public void LoadNpcPath(int mapId, List<PointF> gameWaypoints)
+        {
+            try
             {
-                for (var l = 0; l < selected; l++)
+                _mapProvider.LoadMap(mapId);
+                if (!_mapProvider.IsMapLoaded)
                 {
-                    pasteTable.Tables[0].Rows.Add(gridWaypoint[1, l].Value, gridWaypoint[2, l].Value, gridWaypoint[3, l].Value, gridWaypoint[4, l].Value, gridWaypoint[5, l].Value, gridWaypoint[6, l].Value);
+                    MessageBox.Show($"Map {mapId} could not be loaded", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
 
-            }
+                _paths.Clear();
+                _markers.Clear();
 
-            // If pasting below selected row, add selected row to pasteTable before copiedRows
-            if (!above)
-                pasteTable.Tables[0].Rows.Add(gridWaypoint[1, selected].Value, gridWaypoint[2, selected].Value, gridWaypoint[3, selected].Value, gridWaypoint[4, selected].Value, gridWaypoint[5, selected].Value, gridWaypoint[6, selected].Value);
-
-            // Add copiedRows
-            for (var l = copiedRows.Tables[0].Rows.Count - 1; l > -1; l--)
-            {
-                pasteTable.Tables[0].Rows.Add(copiedRows.Tables[0].Rows[l].Field<string>(0), copiedRows.Tables[0].Rows[l].Field<string>(1), copiedRows.Tables[0].Rows[l].Field<string>(2), copiedRows.Tables[0].Rows[l].Field<string>(3), copiedRows.Tables[0].Rows[l].Field<string>(4), copiedRows.Tables[0].Rows[l].Field<string>(5));
-            }
-
-            // If pasting above selected row, add selected row to pasteTable after copiedRows
-            if (above)
-                pasteTable.Tables[0].Rows.Add(gridWaypoint[1, selected].Value, gridWaypoint[2, selected].Value, gridWaypoint[3, selected].Value, gridWaypoint[4, selected].Value, gridWaypoint[5, selected].Value, gridWaypoint[6, selected].Value);
-
-            // Add all rows below selected row
-            if (selected < gridWaypoint.Rows.Count - 1)
-            {
-                for (var l = selected + 1; l < gridWaypoint.Rows.Count; l++)
+                // Convert all waypoints to world coordinates
+                var worldWaypoints = new List<PointF>();
+                foreach (var p in gameWaypoints)
                 {
-                    pasteTable.Tables[0].Rows.Add(gridWaypoint[1, l].Value, gridWaypoint[2, l].Value, gridWaypoint[3, l].Value, gridWaypoint[4, l].Value, gridWaypoint[5, l].Value, gridWaypoint[6, l].Value);
+                    var worldPoint = _mapProvider.GameToWorld(p);
+                    worldWaypoints.Add(worldPoint);
+                    Console.WriteLine($"Waypoint: Game({p.X:F1},{p.Y:F1}) -> World({worldPoint.X:F1},{worldPoint.Y:F1})");
                 }
 
+                // Build path in world coordinates
+                var path = new SKPath();
+                if (worldWaypoints.Count > 0)
+                {
+                    path.MoveTo(worldWaypoints[0].X, worldWaypoints[0].Y);
+                    for (int i = 1; i < worldWaypoints.Count; i++)
+                    {
+                        path.LineTo(worldWaypoints[i].X, worldWaypoints[i].Y);
+                    }
+                }
+
+                var pathPaint = new SKPaint
+                {
+                    Color = new SKColor(
+                        Properties.Settings.Default.LineColour.R,
+                        Properties.Settings.Default.LineColour.G,
+                        Properties.Settings.Default.LineColour.B
+                    ),
+                    StrokeWidth = 2,
+                    IsStroke = true,
+                    IsAntialias = true
+                };
+
+                // Add markers in world coordinates
+                for (int i = 0; i < worldWaypoints.Count; i++)
+                {
+                    _markers.Add(new MarkerData
+                    {
+                        Position = new SKPoint(worldWaypoints[i].X, worldWaypoints[i].Y),
+                        Paint = new SKPaint
+                        {
+                            Color = SKColors.Red,
+                            IsStroke = false,
+                            IsAntialias = true
+                        },
+                        Label = (i + 1).ToString()
+                    });
+                }
+
+                // Center view
+                if (worldWaypoints.Count > 0)
+                {
+                    float centerX = worldWaypoints.Average(p => p.X);
+                    float centerY = worldWaypoints.Average(p => p.Y);
+                    _mapProvider.Center = new PointF(centerX, centerY);
+                    Console.WriteLine($"Centering at: World({centerX:F1},{centerY:F1})");
+
+                    // Calculate optimal zoom
+                    if (worldWaypoints.Count > 1)
+                    {
+                        var minX = worldWaypoints.Min(p => p.X);
+                        var maxX = worldWaypoints.Max(p => p.X);
+                        var minY = worldWaypoints.Min(p => p.Y);
+                        var maxY = worldWaypoints.Max(p => p.Y);
+
+                        float spanX = (maxX - minX) * 1.2f;
+                        float spanY = (maxY - minY) * 1.2f;
+
+                        float zoomX = _mapControl.Width / spanX;
+                        float zoomY = _mapControl.Height / spanY;
+
+                        _mapProvider.Zoom = Math.Min(zoomX, zoomY) * 0.9f;
+                        _mapProvider.Zoom = Math.Max(0.5f, Math.Min(_mapProvider.Zoom, 1.5f));
+                        Console.WriteLine($"Calculated Zoom: {_mapProvider.Zoom:F2} (X:{zoomX:F2}, Y:{zoomY:F2})");
+                    }
+                    else
+                    {
+                        _mapProvider.Zoom = 1.0f;
+                    }
+                }
+
+                _mapControl.Invalidate();
             }
-
-            // All data now in pasteTable. Now to replace grid contents with pasteTable.
-            gridWaypoint.Rows.Clear();
-
-            for (var l = 0; l < pasteTable.Tables[0].Rows.Count; l++)
-                gridWaypoint.Rows.Add(l + 1, pasteTable.Tables[0].Rows[l].Field<string>(0), pasteTable.Tables[0].Rows[l].Field<string>(1), pasteTable.Tables[0].Rows[l].Field<string>(2), pasteTable.Tables[0].Rows[l].Field<string>(3), pasteTable.Tables[0].Rows[l].Field<string>(4), pasteTable.Tables[0].Rows[l].Field<string>(5));
-
-            GraphPath();
-            Findrange();
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading NPC path: {ex}");
+                MessageBox.Show($"Error loading path: {ex.Message}");
+            }
         }
 
         public void LoadSniffFileIntoDatatable(string fileName)
@@ -355,23 +871,30 @@ namespace Frm_waypoint
 
                 if (filetype == "# TrinityCore - WowPacketParser")
                 {
-                    Sniff_version_6();
-                    waypoints.Clear();
-                    waypoints = ParseSniffData(reader); // Process remaining data with the same reader
-                    this.Text = "Waypoint Creator - Movement data loaded from SMSG_ON_MONSTER_MOVE";
+                    Sniff_version();
+                    ParseSniffData(reader);
+
+                    this.Invoke((MethodInvoker)delegate {
+                        this.Text = "Waypoint Creator - Movement data loaded from SMSG_ON_MONSTER_MOVE";
+                    });
                 }
                 else
                 {
-                    MessageBox.Show($"{fileName} is not a valid TrinityCore parsed sniff file.", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Invoke((MethodInvoker)delegate {
+                        MessageBox.Show($"{fileName} is not a valid TrinityCore parsed sniff file.",
+                            "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    });
                 }
             }
         }
 
-        private DataTable ParseSniffData(StreamReader reader)
+        private void ParseSniffData(StreamReader reader)
         {
-            DataTable dt = new DataTable("Waypoints");
-            dt.Columns.AddRange(new[] { "entry", "guid", "x", "y", "z", "o", "time", "mapID" }
-                .Select(c => new DataColumn(c)).ToArray());
+            if (waypoints.Columns.Count == 0)
+            {
+                waypoints.Columns.AddRange(new[] { "entry", "guid", "x", "y", "z", "o", "time", "mapID" }
+                    .Select(c => new DataColumn(c)).ToArray());
+            }
 
             Packet sniff = new Packet { o = "NULL" };
             string line;
@@ -392,13 +915,27 @@ namespace Frm_waypoint
                     while ((line = reader.ReadLine()) != null && !string.IsNullOrEmpty(line))
                     {
                         string[] packetline = line.Split(' ');
+
+                        // Extract creature info and mapID from MoverGUID line
                         if (line.Contains(sniff_move_1) && (line.Contains(sniff_move_2) || line.Contains(sniff_move_3)))
                         {
                             sniff.entry = packetline[move_entry];
                             sniff.guid = packetline[move_guid];
+
+                            // Find and extract mapID from the "Map: X" part
+                            for (int i = 0; i < packetline.Length; i++)
+                            {
+                                if (packetline[i] == "Map:")
+                                {
+                                    mapID = packetline[i + 1];
+                                    Console.WriteLine($"Extracted mapID: {mapID}");
+                                    break;
+                                }
+                            }
                         }
                         else if (line.Contains(sniff_move_4))
                         {
+                            // Position coordinates
                             sniff.x = packetline[move_x];
                             sniff.y = packetline[move_y];
                             sniff.z = packetline[move_z];
@@ -406,30 +943,32 @@ namespace Frm_waypoint
                         }
                         else if (line.Contains(sniff_move_5))
                         {
+                            // Movement points
                             sniff.x = packetline[move_pointx];
                             sniff.y = packetline[move_pointy];
                             sniff.z = packetline[move_pointz];
                         }
                         else if (line.Contains(sniff_move_6))
                         {
+                            // End of movement data
                             sniff.entry = "";
                             break;
                         }
                         else if (line.Contains(sniff_move_7))
                         {
+                            // Orientation
                             sniff.o = packetline[move_o];
                         }
                     }
 
                     if (!string.IsNullOrEmpty(sniff.entry))
                     {
-                        dt.Rows.Add(sniff.entry, sniff.guid, sniff.x, sniff.y, sniff.z, sniff.o, sniff.time, mapID);
+                        waypoints.Rows.Add(sniff.entry, sniff.guid, sniff.x, sniff.y, sniff.z, sniff.o, sniff.time, mapID);
+                        Console.WriteLine($"Added waypoint: Entry={sniff.entry}, Map={mapID}, X={sniff.x}, Y={sniff.y}");
                         sniff.entry = "";
                     }
                 }
             }
-
-            return dt;
         }
 
         private static readonly Dictionary<string, string> CreatureNameCache = new Dictionary<string, string>();
@@ -483,6 +1022,9 @@ namespace Frm_waypoint
             lst.Sort();
             listBox.DataSource = lst;
             listBox.Refresh();
+
+            // Store this as the original list for search functionality
+            _originalListBoxItems = new List<string>(lst);
         }
 
         private string ExtractFullGuid(string fullGuid)
@@ -496,17 +1038,15 @@ namespace Frm_waypoint
                 var fullHexMatch = System.Text.RegularExpressions.Regex.Match(fullGuid, @"Full:\s*(0x[0-9A-F]+)");
                 if (fullHexMatch.Success)
                 {
-                    return fullHexMatch.Groups[1].Value; // Return full hex GUID
+                    return fullHexMatch.Groups[1].Value;
                 }
             }
 
-            // Handle hex GUID (0x...)
             if (fullGuid.StartsWith("0x"))
             {
-                return fullGuid.Split(' ')[0]; // Return just the hex value
+                return fullGuid.Split(' ')[0];
             }
 
-            // Fallback - return raw string
             return fullGuid;
         }
 
@@ -522,7 +1062,7 @@ namespace Frm_waypoint
                 if (parts.Length > 1)
                 {
                     var lowPart = parts[1].Trim().Split(' ')[0];
-                    return lowPart; // Return just the low GUID number
+                    return lowPart;
                 }
             }
 
@@ -538,14 +1078,17 @@ namespace Frm_waypoint
                 return long.Parse(hex, System.Globalization.NumberStyles.HexNumber).ToString();
             }
 
-            // Fallback - return all digits
             var digits = new string(fullGuid.Where(c => char.IsDigit(c)).ToArray());
             return digits.Length > 0 ? digits : "0";
         }
 
         public void FillGrid()
         {
+            Console.WriteLine("\nFilling grid...");
+            Console.WriteLine($"Current creature_guid: {creature_guid}");
+
             movePackets = waypoints.Clone();
+            int matches = 0;
 
             foreach (DataRow row in waypoints.Rows)
             {
@@ -553,107 +1096,186 @@ namespace Frm_waypoint
                 if (rowFullGuid == creature_guid)
                 {
                     movePackets.ImportRow(row);
-                    creature_entry = row.Field<string>(0); // Ensure correct entry
+                    creature_entry = row.Field<string>(0);
+                    matches++;
                 }
             }
 
+            Console.WriteLine($"Found {matches} matching waypoints");
+
             if (movePackets.Rows.Count > 0)
             {
-                creature_entry = movePackets.Rows[0].Field<string>(0);
+                // Get mapID from the first waypoint
+                mapID = movePackets.Rows[0].Field<string>(7);
+                Console.WriteLine($"Using mapID {mapID} from waypoint data");
 
                 gridWaypoint.Rows.Clear();
 
                 for (var l = 0; l < movePackets.Rows.Count; l++)
-                    gridWaypoint.Rows.Add(l + 1, movePackets.Rows[l].Field<string>(2),
-                                         movePackets.Rows[l].Field<string>(3),
-                                         movePackets.Rows[l].Field<string>(4),
-                                         movePackets.Rows[l].Field<string>(5),
-                                         movePackets.Rows[l].Field<string>(6), "");
+                {
+                    gridWaypoint.Rows.Add(
+                        l + 1,
+                        movePackets.Rows[l].Field<string>(2), // x
+                        movePackets.Rows[l].Field<string>(3), // y
+                        movePackets.Rows[l].Field<string>(4), // z
+                        movePackets.Rows[l].Field<string>(5), // o
+                        movePackets.Rows[l].Field<string>(6), // time
+                        "" // delay
+                    );
+                }
             }
 
             Findrange();
+            PlotCurrentWaypoints();
         }
 
-        public void GraphPath()
+        private void CopySelection()
         {
-            // Clear and set up chart basics
-            chart.BackColor = Properties.Settings.Default.BackColour;
-            chart.ChartAreas[0].BackColor = Properties.Settings.Default.BackColour;
-            chart.ChartAreas[0].AxisX.ScaleView.ZoomReset();
-            chart.ChartAreas[0].AxisY.ScaleView.ZoomReset();
-            chart.ChartAreas[0].AxisY.IsReversed = true;
-            chart.Titles.Clear();
-            chart.Series.Clear();
-
-            // Check if we have a valid selection
-            if (listBox.SelectedItem == null || gridWaypoint.RowCount == 0)
-            {
+            if (gridWaypoint.SelectedRows.Count == 0)
                 return;
+
+            var sb = new StringBuilder();
+
+            sb.AppendLine("Point,X,Y,Z,Orientation,Time,Delay");
+
+            var sortedRows = gridWaypoint.SelectedRows.Cast<DataGridViewRow>()
+                .OrderBy(row => Convert.ToInt32(row.Cells[0].Value ?? "0"))
+                .ToList();
+
+            foreach (DataGridViewRow row in sortedRows)
+            {
+                sb.AppendLine(string.Join(",",
+                    (row.Cells[0].Value ?? "").ToString(),
+                    (row.Cells[1].Value ?? "").ToString(),
+                    (row.Cells[2].Value ?? "").ToString(),
+                    (row.Cells[3].Value ?? "").ToString(),
+                    (row.Cells[4].Value ?? "").ToString(),
+                    (row.Cells[5].Value ?? "").ToString(),
+                    (row.Cells[6].Value ?? "").ToString()
+                ));
             }
 
-            // Extract creature info from the selected list item
-            string selectedText = listBox.SelectedItem.ToString();
-            string displayName = "Entry " + creature_entry;
-            string creatureName = "Unknown";
+            _clip.Clear();
 
-            // Parse the formatted string "Entry - Name (GUID)"
-            if (selectedText.Contains(" - ") && selectedText.Contains(" ("))
+            // Store in both CSV format and internal format
+            DataObject data = new DataObject();
+            data.SetData(DataFormats.CommaSeparatedValue, sb.ToString());
+            data.SetData(DataFormats.Text, sb.ToString());
+
+            foreach (DataGridViewRow row in sortedRows)
             {
-                try
+                _clip.Add(new[]
                 {
-                    string[] parts = selectedText.Split(new[] { " - ", " (" }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length >= 3)
+            row.Cells[1].Value?.ToString(),
+            row.Cells[2].Value?.ToString(),
+            row.Cells[3].Value?.ToString(),
+            row.Cells[4].Value?.ToString(),
+            row.Cells[5].Value?.ToString(),
+            row.Cells[6].Value?.ToString()
+        });
+            }
+            data.SetData("WaypointCreatorInternalFormat", _clip);
+
+            Clipboard.SetDataObject(data, true);
+        }
+
+        private void PasteSelection()
+        {
+            _clip.Clear();
+
+            if (Clipboard.ContainsData("WaypointCreatorInternalFormat"))
+            {
+                _clip = (List<string[]>)Clipboard.GetData("WaypointCreatorInternalFormat");
+            }
+            else if (Clipboard.ContainsText())
+            {
+                string[] lines = Clipboard.GetText().Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                if (lines.Length == 0) return;
+
+                bool hasHeader = false;
+
+                // Check for header
+                foreach (string raw in lines)
+                {
+                    string[] v = raw.Split(',');
+                    if (v.Length >= 4 &&
+                        v[0].Equals("Point", StringComparison.OrdinalIgnoreCase) &&
+                        v[1].Equals("X", StringComparison.OrdinalIgnoreCase) &&
+                        v[2].Equals("Y", StringComparison.OrdinalIgnoreCase) &&
+                        v[3].Equals("Z", StringComparison.OrdinalIgnoreCase))
                     {
-                        creatureName = parts[1];
-                        displayName = $"{creatureName} (Entry: {creature_entry})";
+                        hasHeader = true;
+                        break;
                     }
                 }
-                catch
+
+                // If no header found, skip processing
+                if (!hasHeader) return;
+
+                // Process data rows
+                foreach (string raw in lines)
                 {
-                    // Fallback to basic display if parsing fails
-                    displayName = $"Entry {creature_entry}";
+                    string[] v = raw.Split(',');
+
+                    // Skip header lines
+                    if (v.Length >= 4 &&
+                        v[0].Equals("Point", StringComparison.OrdinalIgnoreCase) &&
+                        v[1].Equals("X", StringComparison.OrdinalIgnoreCase) &&
+                        v[2].Equals("Y", StringComparison.OrdinalIgnoreCase) &&
+                        v[3].Equals("Z", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    // Process data rows: require Point,X,Y,Z and valid numbers for X,Y,Z
+                    if (v.Length >= 4 &&
+                        int.TryParse(v[0], out _) &&
+                        double.TryParse(v[1], out _) &&
+                        double.TryParse(v[2], out _) &&
+                        double.TryParse(v[3], out _))
+                    {
+                        _clip.Add(new[]
+                        {
+                    v[1], // X
+                    v[2], // Y
+                    v[3], // Z
+                    v.Length > 4 ? v[4] : "100", // Orientation
+                    v.Length > 5 ? v[5] : "0", // Time
+                    v.Length > 6 ? v[6] : "0"  // Delay
+                });
+                    }
                 }
             }
 
-            // Set chart title
-            Title title = chart.Titles.Add(displayName);
-            title.Font = new Font("Arial", 16, FontStyle.Bold);
-            title.ForeColor = Properties.Settings.Default.TitleColour;
+            if (_clip.Count == 0) return;
 
-            chart.Series.Clear();
-            chart.Series.Add("Path");
-            chart.Series["Path"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            // Insert at the selected row's index (below it) or at the end if no selection
+            int insertIndex = gridWaypoint.SelectedRows.Count > 0 ? gridWaypoint.SelectedRows[0].Index + 1 : gridWaypoint.Rows.Count;
 
-            if (Properties.Settings.Default.Lines == true)
+            foreach (var wp in _clip)
             {
-                chart.Series.Add("Line");
-
-                if (Properties.Settings.Default.Splines == true)
-                {
-                    chart.Series["Line"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-                }
-                else
-                {
-                    chart.Series["Line"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                }
+                gridWaypoint.Rows.Insert(insertIndex, new object[] { null, wp[0], wp[1], wp[2], wp[3], wp[4], wp[5] });
+                // Highlight the new row in green
+                gridWaypoint.Rows[insertIndex].DefaultCellStyle.BackColor = Color.LightGreen;
+                insertIndex++;
             }
 
-            // Add data points to the chart
-            for (var l = 0; l < gridWaypoint.RowCount; l++)
-            {
-                Double xpos = Convert.ToDouble(gridWaypoint[1, l].Value);
-                Double ypos = Convert.ToDouble(gridWaypoint[2, l].Value);
+            Renumber();
+            PlotCurrentWaypoints();
+            Findrange();
+        }
 
-                chart.Series["Path"].Points.AddXY(xpos, ypos);
-                chart.Series["Path"].Points[l].Color = Properties.Settings.Default.PointColour;
-                chart.Series["Path"].Points[l].Label = Convert.ToString(l + 1);
+        private void DeleteSelection()
+        {
+            foreach (DataGridViewRow r in gridWaypoint.SelectedRows)
+                gridWaypoint.Rows.Remove(r);
+            Renumber(); PlotCurrentWaypoints(); Findrange();
+        }
 
-                if (Properties.Settings.Default.Lines == true)
-                {
-                    chart.Series["Line"].Points.AddXY(xpos, ypos);
-                    chart.Series["Line"].Points[l].Color = Properties.Settings.Default.LineColour;
-                }
-            }
+        private void Renumber()
+        {
+            for (int i = 0; i < gridWaypoint.Rows.Count; i++)
+                gridWaypoint[0, i].Value = i + 1;
         }
 
         private string GenerateSQL_vmangos()
@@ -748,7 +1370,6 @@ namespace Frm_waypoint
                 string z = gridWaypoint[3, i].Value?.ToString() ?? "0.0f";
                 string o = gridWaypoint[4, i].Value?.ToString() ?? "0.0f";
 
-                // Ensure values end with 'f' for float literals
                 if (!x.EndsWith("f")) x += "f";
                 if (!y.EndsWith("f")) y += "f";
                 if (!z.EndsWith("f")) z += "f";
@@ -769,7 +1390,7 @@ namespace Frm_waypoint
             return code;
         }
 
-        private void Sniff_version_6()
+        private void Sniff_version()
         {
             state_map = 1;
             move_time = 9;

@@ -1,4 +1,7 @@
-﻿namespace Frm_waypoint
+﻿using SkiaSharp.Views.Desktop;
+using System.Windows.Forms;
+
+namespace Frm_waypoint
 {
     partial class Frm_Waypoint
     {
@@ -30,10 +33,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Waypoint));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -46,7 +45,7 @@
             this.toolStripSQL = new System.Windows.Forms.ToolStrip();
             this.toolStripButtonSave = new System.Windows.Forms.ToolStripButton();
             this.tabEditor = new System.Windows.Forms.TabPage();
-            this.chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.skiaMapControl = new SKGLControl();
             this.listBox = new System.Windows.Forms.ListBox();
             this.gridWaypoint = new System.Windows.Forms.DataGridView();
             this.gridColumn_no = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -59,12 +58,13 @@
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pasteAboveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pasteBelowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.createSQLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.makegoXyzToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.makegoMidpointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripEdit = new System.Windows.Forms.ToolStrip();
             this.toolStripButtonSearch = new System.Windows.Forms.ToolStripButton();
             this.toolStripTextBoxEntry = new System.Windows.Forms.ToolStripTextBox();
@@ -77,11 +77,9 @@
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.makegoMidpointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabOutput.SuspendLayout();
             this.toolStripSQL.SuspendLayout();
             this.tabEditor.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridWaypoint)).BeginInit();
             this.contextMenuStrip.SuspendLayout();
             this.toolStripEdit.SuspendLayout();
@@ -145,7 +143,7 @@
             // 
             // tabEditor
             // 
-            this.tabEditor.Controls.Add(this.chart);
+            this.tabEditor.Controls.Add(this.skiaMapControl);
             this.tabEditor.Controls.Add(this.listBox);
             this.tabEditor.Controls.Add(this.gridWaypoint);
             this.tabEditor.Controls.Add(this.toolStripEdit);
@@ -158,94 +156,15 @@
             this.tabEditor.Text = "Waypoint Editor";
             this.tabEditor.UseVisualStyleBackColor = true;
             // 
-            // chart
+            // skiaMapControl
             // 
-            this.chart.BorderlineWidth = 0;
-            this.chart.BorderSkin.BackColor = System.Drawing.Color.Transparent;
-            this.chart.BorderSkin.BorderColor = System.Drawing.Color.Transparent;
-            this.chart.BorderSkin.BorderWidth = 0;
-            chartArea1.AlignmentOrientation = ((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations)((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Vertical | System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal)));
-            chartArea1.AxisX.IsReversed = true;
-            chartArea1.AxisX.IsStartedFromZero = false;
-            chartArea1.AxisX.LabelStyle.ForeColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX.MajorGrid.Enabled = false;
-            chartArea1.AxisX.MajorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX.MajorTickMark.Enabled = false;
-            chartArea1.AxisX.MajorTickMark.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX.MinorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX.MinorTickMark.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX.MinorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.None;
-            chartArea1.AxisX.ScaleBreakStyle.Enabled = true;
-            chartArea1.AxisX.ScaleBreakStyle.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX.ScrollBar.ButtonColor = System.Drawing.Color.Silver;
-            chartArea1.AxisX.ScrollBar.LineColor = System.Drawing.Color.Black;
-            chartArea1.AxisX.TitleForeColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX2.MajorGrid.Enabled = false;
-            chartArea1.AxisX2.MajorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX2.MajorTickMark.Enabled = false;
-            chartArea1.AxisX2.MajorTickMark.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisX2.MinorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea1.AxisY.IsStartedFromZero = false;
-            chartArea1.AxisY.LabelStyle.Enabled = false;
-            chartArea1.AxisY.LabelStyle.IsEndLabelVisible = false;
-            chartArea1.AxisY.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.MajorGrid.Enabled = false;
-            chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.MajorTickMark.Enabled = false;
-            chartArea1.AxisY.MinorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.MinorTickMark.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.MinorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.None;
-            chartArea1.AxisY.ScaleBreakStyle.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.ScrollBar.ButtonColor = System.Drawing.Color.Silver;
-            chartArea1.AxisY.ScrollBar.LineColor = System.Drawing.Color.Black;
-            chartArea1.AxisY.TitleForeColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY2.MajorGrid.Enabled = false;
-            chartArea1.AxisY2.MajorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY2.MajorTickMark.Enabled = false;
-            chartArea1.AxisY2.MajorTickMark.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY2.MinorGrid.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY2.MinorTickMark.LineColor = System.Drawing.Color.Transparent;
-            chartArea1.BorderColor = System.Drawing.Color.Transparent;
-            chartArea1.CursorX.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Number;
-            chartArea1.CursorX.IsUserEnabled = true;
-            chartArea1.CursorX.IsUserSelectionEnabled = true;
-            chartArea1.CursorX.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            chartArea1.CursorY.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Number;
-            chartArea1.CursorY.IsUserEnabled = true;
-            chartArea1.CursorY.IsUserSelectionEnabled = true;
-            chartArea1.CursorY.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            chartArea1.Name = "ChartArea1";
-            this.chart.ChartAreas.Add(chartArea1);
-            this.chart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Enabled = false;
-            legend1.ForeColor = System.Drawing.Color.Transparent;
-            legend1.HeaderSeparatorColor = System.Drawing.Color.Transparent;
-            legend1.ItemColumnSeparatorColor = System.Drawing.Color.Transparent;
-            legend1.Name = "Legend1";
-            legend1.TitleForeColor = System.Drawing.Color.Transparent;
-            legend1.TitleSeparatorColor = System.Drawing.Color.Transparent;
-            this.chart.Legends.Add(legend1);
-            this.chart.Location = new System.Drawing.Point(6, 48);
-            this.chart.Margin = new System.Windows.Forms.Padding(0);
-            this.chart.Name = "chart";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series1.Color = System.Drawing.Color.Red;
-            series1.Legend = "Legend1";
-            series1.Name = "Path";
-            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.chart.Series.Add(series1);
-            this.chart.Size = new System.Drawing.Size(1358, 1207);
-            this.chart.TabIndex = 25;
-            this.chart.Text = "Waypoints";
-            title1.DockedToChartArea = "ChartArea1";
-            title1.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            title1.Name = "Path";
-            title1.TextOrientation = System.Windows.Forms.DataVisualization.Charting.TextOrientation.Horizontal;
-            this.chart.Titles.Add(title1);
+            this.skiaMapControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.skiaMapControl.Location = new System.Drawing.Point(6, 48);
+            this.skiaMapControl.Margin = new System.Windows.Forms.Padding(6);
+            this.skiaMapControl.Name = "skiaMapControl";
+            this.skiaMapControl.Size = new System.Drawing.Size(1358, 1207);
+            this.skiaMapControl.TabIndex = 27;
+            this.skiaMapControl.Text = "skControl1";
             // 
             // listBox
             // 
@@ -383,19 +302,20 @@
             this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cutToolStripMenuItem,
             this.copyToolStripMenuItem,
-            this.pasteAboveToolStripMenuItem,
-            this.pasteBelowToolStripMenuItem,
+            this.pasteToolStripMenuItem,
+            this.deleteToolStripMenuItem,
             this.toolStripSeparator,
             this.createSQLToolStripMenuItem,
             this.toolStripSeparator2,
             this.makegoXyzToolStripMenuItem,
             this.makegoMidpointToolStripMenuItem});
-            this.contextMenuStrip.Name = "contextMenuStrip1";
-            this.contextMenuStrip.Size = new System.Drawing.Size(301, 326);
+            this.contextMenuStrip.Name = "contextMenuStrip";
+            this.contextMenuStrip.Size = new System.Drawing.Size(301, 288);
             // 
             // cutToolStripMenuItem
             // 
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
+            this.cutToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
             this.cutToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.cutToolStripMenuItem.Text = "Cut";
             this.cutToolStripMenuItem.Click += new System.EventHandler(this.CutToolStripMenuItem_Click);
@@ -403,23 +323,26 @@
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
             this.copyToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.CopyToolStripMenuItem_Click);
             // 
-            // pasteAboveToolStripMenuItem
+            // pasteToolStripMenuItem
             // 
-            this.pasteAboveToolStripMenuItem.Name = "pasteAboveToolStripMenuItem";
-            this.pasteAboveToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
-            this.pasteAboveToolStripMenuItem.Text = "Paste Above";
-            this.pasteAboveToolStripMenuItem.Click += new System.EventHandler(this.PasteAboveToolStripMenuItem_Click);
+            this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
+            this.pasteToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
+            this.pasteToolStripMenuItem.Text = "Paste";
+            this.pasteToolStripMenuItem.Click += new System.EventHandler(this.PasteToolStripMenuItem_Click);
             // 
-            // pasteBelowToolStripMenuItem
+            // deleteToolStripMenuItem
             // 
-            this.pasteBelowToolStripMenuItem.Name = "pasteBelowToolStripMenuItem";
-            this.pasteBelowToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
-            this.pasteBelowToolStripMenuItem.Text = "Paste Below";
-            this.pasteBelowToolStripMenuItem.Click += new System.EventHandler(this.PasteBelowToolStripMenuItem_Click);
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
             // toolStripSeparator
             // 
@@ -444,6 +367,13 @@
             this.makegoXyzToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
             this.makegoXyzToolStripMenuItem.Text = "Make .go xyz";
             this.makegoXyzToolStripMenuItem.Click += new System.EventHandler(this.MakegoXyzToolStripMenuItem_Click);
+            // 
+            // makegoMidpointToolStripMenuItem
+            // 
+            this.makegoMidpointToolStripMenuItem.Name = "makegoMidpointToolStripMenuItem";
+            this.makegoMidpointToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
+            this.makegoMidpointToolStripMenuItem.Text = "Make .go midpoint";
+            this.makegoMidpointToolStripMenuItem.Click += new System.EventHandler(this.MakegoMidpointToolStripMenuItem_Click);
             // 
             // toolStripEdit
             // 
@@ -481,7 +411,6 @@
             this.toolStripTextBoxEntry.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.toolStripTextBoxEntry.Enabled = false;
             this.toolStripTextBoxEntry.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.toolStripTextBoxEntry.MaxLength = 6;
             this.toolStripTextBoxEntry.Name = "toolStripTextBoxEntry";
             this.toolStripTextBoxEntry.Size = new System.Drawing.Size(136, 42);
             this.toolStripTextBoxEntry.Tag = "";
@@ -563,14 +492,7 @@
             this.toolStripStatusLabel.Size = new System.Drawing.Size(176, 32);
             this.toolStripStatusLabel.Text = "No File Loaded";
             // 
-            // makegoMidpointToolStripMenuItem
-            // 
-            this.makegoMidpointToolStripMenuItem.Name = "makegoMidpointToolStripMenuItem";
-            this.makegoMidpointToolStripMenuItem.Size = new System.Drawing.Size(300, 38);
-            this.makegoMidpointToolStripMenuItem.Text = "Make .go midpoint";
-            this.makegoMidpointToolStripMenuItem.Click += new System.EventHandler(this.MakegoMidpointToolStripMenuItem_Click);
-            // 
-            // frm_Waypoint
+            // Frm_Waypoint
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -580,19 +502,17 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(6);
-            this.Name = "frm_Waypoint";
+            this.Name = "Frm_Waypoint";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Waypoint Creator";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Frm_waypoint_FormClosing);
-            this.Load += new System.EventHandler(this.Frm_waypoint_Load);
             this.tabOutput.ResumeLayout(false);
             this.tabOutput.PerformLayout();
             this.toolStripSQL.ResumeLayout(false);
             this.toolStripSQL.PerformLayout();
             this.tabEditor.ResumeLayout(false);
             this.tabEditor.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridWaypoint)).EndInit();
             this.contextMenuStrip.ResumeLayout(false);
             this.toolStripEdit.ResumeLayout(false);
@@ -607,30 +527,15 @@
 
         #endregion
 
-        internal System.Windows.Forms.DataGridView gridWaypoint;
-        internal System.Windows.Forms.DataVisualization.Charting.Chart chart;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.TabPage tabOutput;
         private System.Windows.Forms.TextBox txtOutput;
-        private System.Windows.Forms.TabPage tabEditor;
-        private System.Windows.Forms.ListBox listBox;
-        private System.Windows.Forms.ToolStrip toolStripEdit;
-        private System.Windows.Forms.ToolStripButton toolStripButtonSearch;
-        private System.Windows.Forms.ToolStripTextBox toolStripTextBoxEntry;
-        private System.Windows.Forms.TabControl tab_Waypoint;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
-        private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem pasteAboveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem pasteBelowToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator;
-        private System.Windows.Forms.ToolStripMenuItem createSQLToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem makegoXyzToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton toolStripButtonSettings;
         private System.Windows.Forms.ToolStrip toolStripSQL;
         private System.Windows.Forms.ToolStripButton toolStripButtonSave;
-        private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.TabPage tabEditor;
+        private SkiaSharp.Views.Desktop.SKGLControl skiaMapControl;
+        private System.Windows.Forms.ListBox listBox;
+        private System.Windows.Forms.DataGridView gridWaypoint;
         private System.Windows.Forms.DataGridViewTextBoxColumn gridColumn_no;
         private System.Windows.Forms.DataGridViewTextBoxColumn gridColumn_x;
         private System.Windows.Forms.DataGridViewTextBoxColumn gridColumn_y;
@@ -638,12 +543,27 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn gridColumn_o;
         private System.Windows.Forms.DataGridViewTextBoxColumn gridColumn_time;
         private System.Windows.Forms.DataGridViewTextBoxColumn gridColumn_delay;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator;
+        private System.Windows.Forms.ToolStripMenuItem createSQLToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem makegoXyzToolStripMenuItem;
+        private System.Windows.Forms.ToolStrip toolStripEdit;
+        private System.Windows.Forms.ToolStripButton toolStripButtonSearch;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBoxEntry;
+        private System.Windows.Forms.ToolStripLabel toolStripLabelEntry;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton toolStripButtonSettings;
         private System.Windows.Forms.ToolStripButton toolStripButtonLoadSniff;
+        private System.Windows.Forms.ToolStripLabel toolStripLabelRange;
+        private System.Windows.Forms.TabControl tab_Waypoint;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
-        private System.Windows.Forms.ToolStripLabel toolStripLabelEntry;
-        private System.Windows.Forms.ToolStripLabel toolStripLabelRange;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem makegoMidpointToolStripMenuItem;
     }
 }

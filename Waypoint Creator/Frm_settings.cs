@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -7,9 +8,10 @@ namespace Frm_waypoint
     public partial class frm_Settings : Form
     {
         public const int boxPoint = 1;
-        public const int boxLine  = 2;
-        public const int boxBack  = 3;
+        public const int boxLine = 2;
+        public const int boxBack = 3;
         public const int boxTitle = 4;
+        public const int boxConnector = 5;
 
         public frm_Settings()
         {
@@ -57,123 +59,109 @@ namespace Frm_waypoint
             SetColour(boxTitle);
         }
 
+        private void BtnConnectorColour_Click(object sender, EventArgs e)
+        {
+            SetColour(boxConnector);
+        }
+
         private void SetColour(int item)
         {
-            ColorDialog colorDlg    = new ColorDialog();
-            colorDlg.AllowFullOpen  = true;
-            colorDlg.AnyColor       = true;
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.AllowFullOpen = true;
+            colorDlg.AnyColor = true;
             colorDlg.SolidColorOnly = false;
-            colorDlg.Color          = Color.Red;
+            colorDlg.Color = Color.Red;
 
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
                 switch (item)
                 {
                     case boxPoint:
+                        Properties.Settings.Default.PointColour = colorDlg.Color;
                         picBoxPointColour.BackColor = colorDlg.Color;
                         break;
                     case boxLine:
+                        Properties.Settings.Default.LineColour = colorDlg.Color;
                         picBoxLineColour.BackColor = colorDlg.Color;
                         break;
                     case boxBack:
+                        Properties.Settings.Default.BackColour = colorDlg.Color;
                         picBoxBackColour.BackColor = colorDlg.Color;
                         break;
                     case boxTitle:
+                        Properties.Settings.Default.TitleColour = colorDlg.Color;
                         picBoxTitleColour.BackColor = colorDlg.Color;
                         break;
+                    case boxConnector:
+                        Properties.Settings.Default.ConnectorLineColour = colorDlg.Color;
+                        picBoxConnectorColour.BackColor = colorDlg.Color;
+                        break;
                 }
+                Properties.Settings.Default.Save();
             }
         }
 
         private void GetValues()
         {
-            if (Properties.Settings.Default.vmangos == true)
-                chkBoxVMaNGOS.CheckState = CheckState.Checked;
-            else
-                chkBoxVMaNGOS.CheckState = CheckState.Unchecked;
+            // SQL Format checkboxes
+            chkBoxVMaNGOS.Checked = Properties.Settings.Default.vmangos;
+            chkBoxCMaNGOS.Checked = Properties.Settings.Default.cmangos;
+            chkBoxTrinityCore.Checked = Properties.Settings.Default.trinitycore;
+            chkBoxCPP.Checked = Properties.Settings.Default.CPP;
 
-            if (Properties.Settings.Default.cmangos == true)
-                chkBoxCMaNGOS.CheckState = CheckState.Checked;
-            else
-                chkBoxCMaNGOS.CheckState = CheckState.Unchecked;
+            // Line options
+            chkBoxLine.Checked = Properties.Settings.Default.Lines;
+            chkBoxSpline.Checked = Properties.Settings.Default.Splines;
+            chkBoxSpline.Enabled = chkBoxLine.Checked;
 
-            if (Properties.Settings.Default.trinitycore == true)
-                chkBoxTrinityCore.CheckState = CheckState.Checked;
-            else
-                chkBoxTrinityCore.CheckState = CheckState.Unchecked;
-
-            if (Properties.Settings.Default.CPP == true)
-                chkBoxCPP.CheckState = CheckState.Checked;
-            else
-                chkBoxCPP.CheckState = CheckState.Unchecked;
-
-            if (Properties.Settings.Default.Lines == true)
-                chkBoxLine.CheckState = CheckState.Checked;
-            else
-                chkBoxLine.CheckState = CheckState.Unchecked;
-
-            if (Properties.Settings.Default.Splines == true)
-                chkBoxSpline.CheckState = CheckState.Checked;
-            else
-                chkBoxSpline.CheckState = CheckState.Unchecked;
-
+            // Color boxes
             picBoxPointColour.BackColor = Properties.Settings.Default.PointColour;
             picBoxLineColour.BackColor = Properties.Settings.Default.LineColour;
             picBoxBackColour.BackColor = Properties.Settings.Default.BackColour;
             picBoxTitleColour.BackColor = Properties.Settings.Default.TitleColour;
+            picBoxConnectorColour.BackColor = Properties.Settings.Default.ConnectorLineColour;
         }
 
         private void SaveValues()
         {
-            if (chkBoxVMaNGOS.CheckState == CheckState.Checked)
-                Properties.Settings.Default.vmangos = true;
-            else
-                Properties.Settings.Default.vmangos = false;
+            // SQL Format
+            Properties.Settings.Default.vmangos = chkBoxVMaNGOS.Checked;
+            Properties.Settings.Default.cmangos = chkBoxCMaNGOS.Checked;
+            Properties.Settings.Default.trinitycore = chkBoxTrinityCore.Checked;
+            Properties.Settings.Default.CPP = chkBoxCPP.Checked;
 
-            if (chkBoxCMaNGOS.CheckState == CheckState.Checked)
-                Properties.Settings.Default.cmangos = true;
-            else
-                Properties.Settings.Default.cmangos = false;
+            // Line options
+            Properties.Settings.Default.Lines = chkBoxLine.Checked;
+            Properties.Settings.Default.Splines = chkBoxSpline.Checked;
 
-            if (chkBoxTrinityCore.CheckState == CheckState.Checked)
-                Properties.Settings.Default.trinitycore = true;
-            else
-                Properties.Settings.Default.trinitycore = false;
-
-            if (chkBoxCPP.CheckState == CheckState.Checked)
-                Properties.Settings.Default.CPP = true;
-            else
-                Properties.Settings.Default.CPP = false;
-
-            if (chkBoxLine.CheckState == CheckState.Checked)
-                Properties.Settings.Default.Lines = true;
-            else
-                Properties.Settings.Default.Lines = false;
-
-            if (chkBoxSpline.CheckState == CheckState.Checked)
-                Properties.Settings.Default.Splines = true;
-            else
-                Properties.Settings.Default.Splines = false;
-
+            // Colors
             Properties.Settings.Default.PointColour = picBoxPointColour.BackColor;
             Properties.Settings.Default.LineColour = picBoxLineColour.BackColor;
             Properties.Settings.Default.BackColour = picBoxBackColour.BackColor;
             Properties.Settings.Default.TitleColour = picBoxTitleColour.BackColor;
+            Properties.Settings.Default.ConnectorLineColour = picBoxConnectorColour.BackColor;
+
             Properties.Settings.Default.Save();
         }
 
         private void SetDefaults()
         {
-            chkBoxVMaNGOS.CheckState = CheckState.Checked;
-            chkBoxCMaNGOS.CheckState = CheckState.Unchecked;
-            chkBoxTrinityCore.CheckState = CheckState.Unchecked;
-            chkBoxCPP.CheckState = CheckState.Unchecked;
-            chkBoxLine.CheckState = CheckState.Checked;
-            chkBoxSpline.CheckState = CheckState.Unchecked;
+            // SQL Format defaults
+            chkBoxVMaNGOS.Checked = true;
+            chkBoxCMaNGOS.Checked = false;
+            chkBoxTrinityCore.Checked = false;
+            chkBoxCPP.Checked = false;
+
+            // Line options defaults
+            chkBoxLine.Checked = true;
+            chkBoxSpline.Checked = false;
+
+            // Color defaults
             picBoxPointColour.BackColor = Color.Blue;
             picBoxLineColour.BackColor = Color.Aqua;
             picBoxBackColour.BackColor = Color.White;
             picBoxTitleColour.BackColor = Color.Blue;
+            picBoxConnectorColour.BackColor = Color.Gray;
         }
 
         private void SQLFormat_CheckedChanged(object sender, EventArgs e)
@@ -182,7 +170,7 @@ namespace Frm_waypoint
 
             if (clickedCheckbox.Checked)
             {
-                // Uncheck all other checkboxes
+                // Uncheck all other SQL format checkboxes
                 foreach (Control control in groupSQL.Controls)
                 {
                     if (control is CheckBox && control != clickedCheckbox)
@@ -193,23 +181,18 @@ namespace Frm_waypoint
             }
             else
             {
-                // If unchecking, ensure at least one remains checked
-                bool anyChecked = chkBoxVMaNGOS.Checked || chkBoxCMaNGOS.Checked ||
-                                 chkBoxTrinityCore.Checked || chkBoxCPP.Checked;
-
-                if (!anyChecked)
+                // Ensure at least one SQL format is checked
+                if (!chkBoxVMaNGOS.Checked && !chkBoxCMaNGOS.Checked &&
+                    !chkBoxTrinityCore.Checked && !chkBoxCPP.Checked)
                 {
-                    clickedCheckbox.Checked = true; // Re-check the box if none are checked
+                    clickedCheckbox.Checked = true;
                 }
             }
         }
 
         private void ChkBoxLine_CheckedChanged(object sender, EventArgs e)
         {
-            // Enable/disable the spline checkbox based on the "Show Lines" state
             chkBoxSpline.Enabled = chkBoxLine.Checked;
-
-            // If "Show Lines" is being unchecked, also uncheck "Linetype Spline"
             if (!chkBoxLine.Checked)
             {
                 chkBoxSpline.Checked = false;

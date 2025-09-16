@@ -188,7 +188,6 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MySQL Login for Waypoint Creator";
-            this.Load += new System.EventHandler(this.Frm_login_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

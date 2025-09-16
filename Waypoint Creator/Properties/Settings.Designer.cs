@@ -214,5 +214,16 @@ namespace Frm_waypoint.Properties {
                 this["CPP"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Drawing.Color ConnectorLineColour {
+            get {
+                return ((global::System.Drawing.Color)(this["ConnectorLineColour"]));
+            }
+            set {
+                this["ConnectorLineColour"] = value;
+            }
+        }
     }
 }

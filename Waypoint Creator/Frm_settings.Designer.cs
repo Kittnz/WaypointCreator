@@ -50,6 +50,8 @@
             this.picBoxTitleColour = new System.Windows.Forms.PictureBox();
             this.colorDialog = new System.Windows.Forms.ColorDialog();
             this.btnDefault = new System.Windows.Forms.Button();
+            this.picBoxConnectorColour = new System.Windows.Forms.PictureBox();
+            this.btnConnectorColour = new System.Windows.Forms.Button();
             this.groupSQL.SuspendLayout();
             this.groupGraph.SuspendLayout();
             this.groupColours.SuspendLayout();
@@ -57,6 +59,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.picBoxLineColour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBoxBackColour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBoxTitleColour)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBoxConnectorColour)).BeginInit();
             this.SuspendLayout();
             // 
             // groupSQL
@@ -65,11 +68,9 @@
             this.groupSQL.Controls.Add(this.chkBoxCMaNGOS);
             this.groupSQL.Controls.Add(this.chkBoxTrinityCore);
             this.groupSQL.Controls.Add(this.chkBoxCPP);
-            this.groupSQL.Location = new System.Drawing.Point(16, 15);
-            this.groupSQL.Margin = new System.Windows.Forms.Padding(4);
+            this.groupSQL.Location = new System.Drawing.Point(12, 12);
             this.groupSQL.Name = "groupSQL";
-            this.groupSQL.Padding = new System.Windows.Forms.Padding(4);
-            this.groupSQL.Size = new System.Drawing.Size(224, 138);
+            this.groupSQL.Size = new System.Drawing.Size(168, 112);
             this.groupSQL.TabIndex = 5;
             this.groupSQL.TabStop = false;
             this.groupSQL.Text = "Output Format";
@@ -77,10 +78,9 @@
             // chkBoxVMaNGOS
             // 
             this.chkBoxVMaNGOS.AutoSize = true;
-            this.chkBoxVMaNGOS.Location = new System.Drawing.Point(8, 23);
-            this.chkBoxVMaNGOS.Margin = new System.Windows.Forms.Padding(4);
+            this.chkBoxVMaNGOS.Location = new System.Drawing.Point(6, 19);
             this.chkBoxVMaNGOS.Name = "chkBoxVMaNGOS";
-            this.chkBoxVMaNGOS.Size = new System.Drawing.Size(125, 20);
+            this.chkBoxVMaNGOS.Size = new System.Drawing.Size(116, 19);
             this.chkBoxVMaNGOS.TabIndex = 6;
             this.chkBoxVMaNGOS.Text = "VMaNGOS SQL";
             this.chkBoxVMaNGOS.UseVisualStyleBackColor = true;
@@ -89,10 +89,9 @@
             // chkBoxCMaNGOS
             // 
             this.chkBoxCMaNGOS.AutoSize = true;
-            this.chkBoxCMaNGOS.Location = new System.Drawing.Point(8, 51);
-            this.chkBoxCMaNGOS.Margin = new System.Windows.Forms.Padding(4);
+            this.chkBoxCMaNGOS.Location = new System.Drawing.Point(6, 41);
             this.chkBoxCMaNGOS.Name = "chkBoxCMaNGOS";
-            this.chkBoxCMaNGOS.Size = new System.Drawing.Size(155, 20);
+            this.chkBoxCMaNGOS.Size = new System.Drawing.Size(145, 19);
             this.chkBoxCMaNGOS.TabIndex = 3;
             this.chkBoxCMaNGOS.Text = "CMaNGOS Path SQL";
             this.chkBoxCMaNGOS.UseVisualStyleBackColor = true;
@@ -101,10 +100,9 @@
             // chkBoxTrinityCore
             // 
             this.chkBoxTrinityCore.AutoSize = true;
-            this.chkBoxTrinityCore.Location = new System.Drawing.Point(8, 79);
-            this.chkBoxTrinityCore.Margin = new System.Windows.Forms.Padding(4);
+            this.chkBoxTrinityCore.Location = new System.Drawing.Point(6, 64);
             this.chkBoxTrinityCore.Name = "chkBoxTrinityCore";
-            this.chkBoxTrinityCore.Size = new System.Drawing.Size(153, 20);
+            this.chkBoxTrinityCore.Size = new System.Drawing.Size(142, 19);
             this.chkBoxTrinityCore.TabIndex = 3;
             this.chkBoxTrinityCore.Text = "TrinityCore Path SQL";
             this.chkBoxTrinityCore.UseVisualStyleBackColor = true;
@@ -113,11 +111,10 @@
             // chkBoxCPP
             // 
             this.chkBoxCPP.AutoSize = true;
-            this.chkBoxCPP.Location = new System.Drawing.Point(8, 107);
-            this.chkBoxCPP.Margin = new System.Windows.Forms.Padding(4);
+            this.chkBoxCPP.Location = new System.Drawing.Point(6, 87);
             this.chkBoxCPP.Name = "chkBoxCPP";
             this.chkBoxCPP.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.chkBoxCPP.Size = new System.Drawing.Size(158, 20);
+            this.chkBoxCPP.Size = new System.Drawing.Size(149, 19);
             this.chkBoxCPP.TabIndex = 5;
             this.chkBoxCPP.Text = "C++ Position Constant";
             this.chkBoxCPP.UseVisualStyleBackColor = true;
@@ -127,11 +124,9 @@
             // 
             this.groupGraph.Controls.Add(this.chkBoxSpline);
             this.groupGraph.Controls.Add(this.chkBoxLine);
-            this.groupGraph.Location = new System.Drawing.Point(16, 161);
-            this.groupGraph.Margin = new System.Windows.Forms.Padding(4);
+            this.groupGraph.Location = new System.Drawing.Point(12, 131);
             this.groupGraph.Name = "groupGraph";
-            this.groupGraph.Padding = new System.Windows.Forms.Padding(4);
-            this.groupGraph.Size = new System.Drawing.Size(224, 75);
+            this.groupGraph.Size = new System.Drawing.Size(168, 61);
             this.groupGraph.TabIndex = 6;
             this.groupGraph.TabStop = false;
             this.groupGraph.Text = "Point Graphing";
@@ -139,22 +134,20 @@
             // chkBoxSpline
             // 
             this.chkBoxSpline.AutoSize = true;
-            this.chkBoxSpline.Location = new System.Drawing.Point(8, 52);
-            this.chkBoxSpline.Margin = new System.Windows.Forms.Padding(4);
+            this.chkBoxSpline.Enabled = false;
+            this.chkBoxSpline.Location = new System.Drawing.Point(6, 42);
             this.chkBoxSpline.Name = "chkBoxSpline";
-            this.chkBoxSpline.Size = new System.Drawing.Size(121, 20);
+            this.chkBoxSpline.Size = new System.Drawing.Size(113, 19);
             this.chkBoxSpline.TabIndex = 6;
             this.chkBoxSpline.Text = "Linetype Spline";
             this.chkBoxSpline.UseVisualStyleBackColor = true;
-            this.chkBoxSpline.Enabled = false;
             // 
             // chkBoxLine
             // 
             this.chkBoxLine.AutoSize = true;
-            this.chkBoxLine.Location = new System.Drawing.Point(8, 23);
-            this.chkBoxLine.Margin = new System.Windows.Forms.Padding(4);
+            this.chkBoxLine.Location = new System.Drawing.Point(6, 19);
             this.chkBoxLine.Name = "chkBoxLine";
-            this.chkBoxLine.Size = new System.Drawing.Size(97, 20);
+            this.chkBoxLine.Size = new System.Drawing.Size(93, 19);
             this.chkBoxLine.TabIndex = 5;
             this.chkBoxLine.Text = "Show Lines";
             this.chkBoxLine.UseVisualStyleBackColor = true;
@@ -162,10 +155,9 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(140, 244);
-            this.btnOK.Margin = new System.Windows.Forms.Padding(4);
+            this.btnOK.Location = new System.Drawing.Point(105, 198);
             this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(100, 28);
+            this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 7;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
@@ -174,10 +166,9 @@
             // btnCancel
             // 
             this.btnCancel.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.btnCancel.Location = new System.Drawing.Point(140, 280);
-            this.btnCancel.Margin = new System.Windows.Forms.Padding(4);
+            this.btnCancel.Location = new System.Drawing.Point(105, 228);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(100, 28);
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 8;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -186,6 +177,8 @@
             // groupColours
             // 
             this.groupColours.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.groupColours.Controls.Add(this.btnConnectorColour);
+            this.groupColours.Controls.Add(this.picBoxConnectorColour);
             this.groupColours.Controls.Add(this.btnPointColour);
             this.groupColours.Controls.Add(this.btnLineColour);
             this.groupColours.Controls.Add(this.btnBackColour);
@@ -194,21 +187,18 @@
             this.groupColours.Controls.Add(this.picBoxLineColour);
             this.groupColours.Controls.Add(this.picBoxBackColour);
             this.groupColours.Controls.Add(this.picBoxTitleColour);
-            this.groupColours.Location = new System.Drawing.Point(251, 15);
-            this.groupColours.Margin = new System.Windows.Forms.Padding(4);
+            this.groupColours.Location = new System.Drawing.Point(188, 12);
             this.groupColours.Name = "groupColours";
-            this.groupColours.Padding = new System.Windows.Forms.Padding(4);
-            this.groupColours.Size = new System.Drawing.Size(181, 175);
+            this.groupColours.Size = new System.Drawing.Size(136, 171);
             this.groupColours.TabIndex = 9;
             this.groupColours.TabStop = false;
             this.groupColours.Text = "Graph Colours";
             // 
             // btnPointColour
             // 
-            this.btnPointColour.Location = new System.Drawing.Point(55, 27);
-            this.btnPointColour.Margin = new System.Windows.Forms.Padding(4);
+            this.btnPointColour.Location = new System.Drawing.Point(41, 22);
             this.btnPointColour.Name = "btnPointColour";
-            this.btnPointColour.Size = new System.Drawing.Size(113, 28);
+            this.btnPointColour.Size = new System.Drawing.Size(85, 23);
             this.btnPointColour.TabIndex = 12;
             this.btnPointColour.Text = "Point Colour";
             this.btnPointColour.UseVisualStyleBackColor = true;
@@ -216,10 +206,9 @@
             // 
             // btnLineColour
             // 
-            this.btnLineColour.Location = new System.Drawing.Point(55, 63);
-            this.btnLineColour.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLineColour.Location = new System.Drawing.Point(41, 51);
             this.btnLineColour.Name = "btnLineColour";
-            this.btnLineColour.Size = new System.Drawing.Size(113, 28);
+            this.btnLineColour.Size = new System.Drawing.Size(85, 23);
             this.btnLineColour.TabIndex = 13;
             this.btnLineColour.Text = "Line Colour";
             this.btnLineColour.UseVisualStyleBackColor = true;
@@ -227,10 +216,9 @@
             // 
             // btnBackColour
             // 
-            this.btnBackColour.Location = new System.Drawing.Point(55, 98);
-            this.btnBackColour.Margin = new System.Windows.Forms.Padding(4);
+            this.btnBackColour.Location = new System.Drawing.Point(41, 80);
             this.btnBackColour.Name = "btnBackColour";
-            this.btnBackColour.Size = new System.Drawing.Size(113, 28);
+            this.btnBackColour.Size = new System.Drawing.Size(85, 23);
             this.btnBackColour.TabIndex = 15;
             this.btnBackColour.Text = "Back Colour";
             this.btnBackColour.UseVisualStyleBackColor = true;
@@ -238,10 +226,9 @@
             // 
             // btnTitleColour
             // 
-            this.btnTitleColour.Location = new System.Drawing.Point(55, 134);
-            this.btnTitleColour.Margin = new System.Windows.Forms.Padding(4);
+            this.btnTitleColour.Location = new System.Drawing.Point(41, 109);
             this.btnTitleColour.Name = "btnTitleColour";
-            this.btnTitleColour.Size = new System.Drawing.Size(113, 28);
+            this.btnTitleColour.Size = new System.Drawing.Size(85, 23);
             this.btnTitleColour.TabIndex = 17;
             this.btnTitleColour.Text = "Title Colour";
             this.btnTitleColour.UseVisualStyleBackColor = true;
@@ -250,59 +237,73 @@
             // picBoxPointColour
             // 
             this.picBoxPointColour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picBoxPointColour.Location = new System.Drawing.Point(8, 27);
-            this.picBoxPointColour.Margin = new System.Windows.Forms.Padding(4);
+            this.picBoxPointColour.Location = new System.Drawing.Point(6, 22);
             this.picBoxPointColour.Name = "picBoxPointColour";
-            this.picBoxPointColour.Size = new System.Drawing.Size(30, 28);
+            this.picBoxPointColour.Size = new System.Drawing.Size(23, 23);
             this.picBoxPointColour.TabIndex = 0;
             this.picBoxPointColour.TabStop = false;
             // 
             // picBoxLineColour
             // 
             this.picBoxLineColour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picBoxLineColour.Location = new System.Drawing.Point(8, 63);
-            this.picBoxLineColour.Margin = new System.Windows.Forms.Padding(4);
+            this.picBoxLineColour.Location = new System.Drawing.Point(6, 51);
             this.picBoxLineColour.Name = "picBoxLineColour";
-            this.picBoxLineColour.Size = new System.Drawing.Size(30, 28);
+            this.picBoxLineColour.Size = new System.Drawing.Size(23, 23);
             this.picBoxLineColour.TabIndex = 2;
             this.picBoxLineColour.TabStop = false;
             // 
             // picBoxBackColour
             // 
             this.picBoxBackColour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picBoxBackColour.Location = new System.Drawing.Point(8, 98);
-            this.picBoxBackColour.Margin = new System.Windows.Forms.Padding(4);
+            this.picBoxBackColour.Location = new System.Drawing.Point(6, 80);
             this.picBoxBackColour.Name = "picBoxBackColour";
-            this.picBoxBackColour.Size = new System.Drawing.Size(30, 28);
+            this.picBoxBackColour.Size = new System.Drawing.Size(23, 23);
             this.picBoxBackColour.TabIndex = 14;
             this.picBoxBackColour.TabStop = false;
             // 
             // picBoxTitleColour
             // 
             this.picBoxTitleColour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picBoxTitleColour.Location = new System.Drawing.Point(8, 134);
-            this.picBoxTitleColour.Margin = new System.Windows.Forms.Padding(4);
+            this.picBoxTitleColour.Location = new System.Drawing.Point(6, 109);
             this.picBoxTitleColour.Name = "picBoxTitleColour";
-            this.picBoxTitleColour.Size = new System.Drawing.Size(30, 28);
+            this.picBoxTitleColour.Size = new System.Drawing.Size(23, 23);
             this.picBoxTitleColour.TabIndex = 16;
             this.picBoxTitleColour.TabStop = false;
             // 
             // btnDefault
             // 
-            this.btnDefault.Location = new System.Drawing.Point(276, 208);
-            this.btnDefault.Margin = new System.Windows.Forms.Padding(4);
+            this.btnDefault.Location = new System.Drawing.Point(207, 189);
             this.btnDefault.Name = "btnDefault";
-            this.btnDefault.Size = new System.Drawing.Size(156, 28);
+            this.btnDefault.Size = new System.Drawing.Size(117, 23);
             this.btnDefault.TabIndex = 10;
             this.btnDefault.Text = "Reset Default Values";
             this.btnDefault.UseVisualStyleBackColor = true;
             this.btnDefault.Click += new System.EventHandler(this.BtnDefault_Click);
             // 
+            // picBoxConnectorColour
+            // 
+            this.picBoxConnectorColour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picBoxConnectorColour.Location = new System.Drawing.Point(6, 138);
+            this.picBoxConnectorColour.Name = "picBoxConnectorColour";
+            this.picBoxConnectorColour.Size = new System.Drawing.Size(23, 23);
+            this.picBoxConnectorColour.TabIndex = 18;
+            this.picBoxConnectorColour.TabStop = false;
+            // 
+            // btnConnectorColour
+            // 
+            this.btnConnectorColour.Location = new System.Drawing.Point(41, 138);
+            this.btnConnectorColour.Name = "btnConnectorColour";
+            this.btnConnectorColour.Size = new System.Drawing.Size(85, 23);
+            this.btnConnectorColour.TabIndex = 19;
+            this.btnConnectorColour.Text = "Dot Color";
+            this.btnConnectorColour.UseVisualStyleBackColor = true;
+            this.btnConnectorColour.Click += new System.EventHandler(this.BtnConnectorColour_Click);
+            // 
             // frm_Settings
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(448, 356);
+            this.ClientSize = new System.Drawing.Size(336, 289);
             this.ControlBox = false;
             this.Controls.Add(this.groupSQL);
             this.Controls.Add(this.groupGraph);
@@ -312,7 +313,6 @@
             this.Controls.Add(this.btnCancel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frm_Settings";
@@ -330,6 +330,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.picBoxLineColour)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBoxBackColour)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBoxTitleColour)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBoxConnectorColour)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -357,5 +358,7 @@
         private System.Windows.Forms.Button btnBackColour;
         private System.Windows.Forms.PictureBox picBoxBackColour;
         private System.Windows.Forms.Button btnDefault;
+        private System.Windows.Forms.Button btnConnectorColour;
+        private System.Windows.Forms.PictureBox picBoxConnectorColour;
     }
 }

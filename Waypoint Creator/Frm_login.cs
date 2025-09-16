@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Data;
 using System.Windows.Forms;
 using MySqlConnector;
-using System.Linq;
-using System.Xml.Linq;
 
 namespace Frm_waypoint
 {
@@ -12,52 +9,65 @@ namespace Frm_waypoint
         public frm_Login()
         {
             InitializeComponent();
+            LoadSavedSettings();
         }
 
-        private void Frm_login_Load(object sender, EventArgs e)
+        private void LoadSavedSettings()
         {
-            // Load values from settings
-            txt_Host.Text = Properties.Settings.Default.host;
-            txt_Username.Text = Properties.Settings.Default.username;
-            txt_Password.Text = Properties.Settings.Default.password;
-            txt_Database.Text = Properties.Settings.Default.database;
-            txt_Port.Text = Properties.Settings.Default.port;
+            var settings = Properties.Settings.Default;
+            txt_Host.Text = settings.host;
+            txt_Username.Text = settings.username;
+            txt_Password.Text = settings.password;
+            txt_Database.Text = settings.database;
+            txt_Port.Text = settings.port;
         }
 
-        private void Btn_OK_Click(object sender, System.EventArgs e)
-		{
-			MySqlConnection conn = null;
-			conn = new MySqlConnection();
-            conn.ConnectionString = "server=" + txt_Host.Text + "; port=" + txt_Port.Text + "; user id=" + txt_Username.Text + "; password=" + txt_Password.Text + "; database=" + txt_Database.Text;
-			try
-			{
-                // Try db connection.
-                conn.Open();
+        private void Btn_OK_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(BuildConnectionString()))
+                {
+                    connection.Open();
 
-                // If db connection success, save values to settings.
-				if (chkBox_SaveValues.Checked == true)
-				{
-                    Properties.Settings.Default.host = txt_Host.Text;
-                    Properties.Settings.Default.username = txt_Username.Text;
-                    Properties.Settings.Default.password = txt_Password.Text;
-                    Properties.Settings.Default.database = txt_Database.Text;
-                    Properties.Settings.Default.port = txt_Port.Text;
+                    if (chkBox_SaveValues.Checked)
+                        SaveConnectionSettings();
+
                     Properties.Settings.Default.UsingDB = true;
                     Properties.Settings.Default.Save();
-				}
 
-                LoadMain();
-			}
-			catch (MySqlException myerror)
-			{
-				MessageBox.Show("Error Connecting to Database please re-enter login information." + Environment.NewLine + myerror.Message);
-			}
-			finally
-			{
-                conn.Close();
-				conn.Dispose();
-			}
-		}
+                    LoadMain();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Connection failed: {ex.Message}",
+                    "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private string BuildConnectionString()
+        {
+            return new MySqlConnectionStringBuilder
+            {
+                Server = txt_Host.Text,
+                Port = uint.Parse(txt_Port.Text), // Throws if invalid
+                UserID = txt_Username.Text,
+                Password = txt_Password.Text,
+                Database = txt_Database.Text
+            }.ToString();
+        }
+
+        private void SaveConnectionSettings()
+        {
+            var settings = Properties.Settings.Default;
+            settings.host = txt_Host.Text;
+            settings.username = txt_Username.Text;
+            settings.password = txt_Password.Text;
+            settings.database = txt_Database.Text;
+            settings.port = txt_Port.Text;
+            settings.Save();
+        }
 
         private void Btn_Cancel_Click(object sender, EventArgs e)
         {
@@ -68,9 +78,7 @@ namespace Frm_waypoint
 
         private void LoadMain()
         {
-            // Open Frm_waypoint and hide login form.
-            System.Windows.Forms.Form Frm_Main = new Frm_Waypoint();
-            Frm_Main.Show();
+            new Frm_Waypoint().Show();
             this.Hide();
         }
     }
