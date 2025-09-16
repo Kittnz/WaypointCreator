@@ -9,14 +9,14 @@ Creates NPC paths using parsed packet files and visualizes them on the game map 
 - **Map Visualization**: View waypoints on game maps using SkiaSharp
 - **Multi-Server Support**: VMaNGOS, TrinityCore, and CMaNGOS SQL output
 - **Database Integration**: Auto-fetch creature names from your database
-- **Search**: Find NPCs by searching for names or NPC entries.
+- **Search**: Find NPCs by searching for names or NPC entries
 - **Map Navigation**: Zoom and pan around the game world
 - **Multi-file Support**: Process multiple sniff files simultaneously
 
 ## Requirements
 
 - Parsed packet files from WowPacketParser
-- Map files in same directory as executable. Download maps here: https://drive.google.com/uc?export=download&id=1fFRgY7gVEbK2bwNQA8RTooE6BI9kydsi
+- Map files in same directory as executable, download maps here: https://drive.google.com/uc?export=download&id=1fFRgY7gVEbK2bwNQA8RTooE6BI9kydsi
 - Database connection (optional, for creature names)
 
 ## Output Support
